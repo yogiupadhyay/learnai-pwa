@@ -1,6 +1,6 @@
 // @ts-nocheck
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const C={bg:"#F8FAFC",card:"#FFFFFF",text:"#0F172A",textMuted:"#64748B",textFaint:"#94A3B8",primary:"#7C3AED",primarySoft:"#F3E8FF",primaryDark:"#5B21B6",blue:"#2563EB",blueSoft:"#EFF6FF",success:"#10B981",successSoft:"#D1FAE5",successDark:"#065F46",warn:"#F59E0B",warnSoft:"#FEF3C7",warnDark:"#78350F",error:"#EF4444",errorSoft:"#FEE2E2",errorDark:"#7F1D1D",border:"#E2E8F0",borderSoft:"#F1F5F9"};
 
@@ -441,6 +441,7 @@ export default function TutorApp(){
   const[currentClass,setCurrentClass]=useState(allClasses[0]);
   const scrollRef=useRef(null);
   const navigate=(s,ctx)=>{setScreen(s);if(ctx!==undefined)setContext(ctx);scrollRef.current?.scrollTo(0,0);};
+  useEffect(()=>{const h=(e)=>navigate(e.detail);window.addEventListener('sidebar-nav',h);return()=>window.removeEventListener('sidebar-nav',h);},[]);
 
   if(!setupDone) return <div style={{fontFamily:'"Inter",-apple-system,sans-serif',maxWidth:"100%",margin:"0 auto",background:C.bg,minHeight:"100vh",borderRadius:0,overflow:"hidden",boxShadow:"none",position:"relative"}}><SetupWizard onComplete={()=>setSetupDone(true)}/></div>;
 

@@ -1,6 +1,6 @@
 // @ts-nocheck
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const C={bg:"#F8FAFC",card:"#FFFFFF",text:"#0F172A",textMuted:"#64748B",textFaint:"#94A3B8",primary:"#1E40AF",primarySoft:"#EFF6FF",primaryDark:"#1E3A8A",teal:"#0D9488",tealSoft:"#F0FDFA",success:"#10B981",successSoft:"#D1FAE5",successDark:"#065F46",warn:"#F59E0B",warnSoft:"#FEF3C7",warnDark:"#78350F",error:"#EF4444",errorSoft:"#FEE2E2",errorDark:"#7F1D1D",border:"#E2E8F0",borderSoft:"#F1F5F9",accent:"#7C3AED",accentSoft:"#F3E8FF"};
 
@@ -301,6 +301,7 @@ export default function OrgApp(){
   const[context,setContext]=useState(null);
   const scrollRef=useRef(null);
   const navigate=(s,ctx)=>{setScreen(s);if(ctx!==undefined)setContext(ctx);scrollRef.current?.scrollTo(0,0);};
+  useEffect(()=>{const h=(e)=>navigate(e.detail);window.addEventListener('sidebar-nav',h);return()=>window.removeEventListener('sidebar-nav',h);},[]);
 
   const navItems=[{id:"dashboard",icon:"home",label:"Dashboard"},{id:"teachers",icon:"users",label:"Teachers"},{id:"curriculum",icon:"book",label:"Curriculum"},{id:"analytics",icon:"chart",label:"Analytics"},{id:"settings",icon:"settings",label:"Settings"}];
   const screens={dashboard:<DashboardScreen navigate={navigate}/>,teachers:<TeachersScreen navigate={navigate}/>,curriculum:<CurriculumScreen navigate={navigate}/>,branding:<BrandingScreen navigate={navigate}/>,analytics:<AnalyticsScreen navigate={navigate}/>,users:<UsersScreen navigate={navigate}/>,settings:<SettingsScreen navigate={navigate}/>};

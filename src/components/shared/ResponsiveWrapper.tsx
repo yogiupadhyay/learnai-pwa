@@ -116,18 +116,22 @@ export default function ResponsiveWrapper({ app, children }) {
         {/* Nav items */}
         <nav style={{ flex: 1, padding: "12px 8px", display: "flex", flexDirection: "column", gap: 2 }}>
           {config.nav.map(item => (
-            <div
+            <button
               key={item.id}
+              onClick={() => window.dispatchEvent(new CustomEvent('sidebar-nav', { detail: item.id }))}
               style={{
                 display: "flex", alignItems: "center", gap: 12,
                 padding: "10px 14px", borderRadius: 12,
                 color: "#64748B", fontSize: 14, fontWeight: 400,
-                cursor: "default",
+                cursor: "pointer", border: "none", background: "transparent",
+                fontFamily: "inherit", width: "100%", textAlign: "left",
               }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#F1F5F9"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
             >
               <SidebarIcon name={item.icon} size={20} color="#64748B" />
               <span>{item.label}</span>
-            </div>
+            </button>
           ))}
         </nav>
 
