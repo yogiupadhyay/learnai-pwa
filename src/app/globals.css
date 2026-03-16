@@ -62,12 +62,13 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
   .grid-stats { grid-template-columns: repeat(4, 1fr) !important; }
   
   /* Hide the inline bottom nav that each app renders (position absolute/fixed at bottom) */
-  .desktop-hide-bottom-nav > div > div:last-child {
+  /* Only when there are multiple sibling divs (skip onboarding/welcome single-div screens) */
+  .desktop-hide-bottom-nav > div > div:last-child:not(:only-child) {
     display: none !important;
   }
-  
+
   /* Hide the mobile top bar on desktop — the sidebar replaces it */
-  .desktop-hide-bottom-nav > div > div:first-child {
+  .desktop-hide-bottom-nav > div > div:first-child:not(:only-child) {
     display: none !important;
   }
   
