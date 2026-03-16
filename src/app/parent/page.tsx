@@ -1,4 +1,12 @@
 // @ts-nocheck
 "use client";
 import ParentApp from "@/components/ParentApp";
-export default function Page() { return <ParentApp />; }
+import ResponsiveWrapper from "@/components/shared/ResponsiveWrapper";
+
+export default function Page() {
+  return (
+    <ResponsiveWrapper app="parent">
+      <ParentApp />
+    </ResponsiveWrapper>
+  );
+}

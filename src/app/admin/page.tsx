@@ -1,4 +1,12 @@
 // @ts-nocheck
 "use client";
 import OrgApp from "@/components/OrgApp";
-export default function Page() { return <OrgApp />; }
+import ResponsiveWrapper from "@/components/shared/ResponsiveWrapper";
+
+export default function Page() {
+  return (
+    <ResponsiveWrapper app="admin">
+      <OrgApp />
+    </ResponsiveWrapper>
+  );
+}

@@ -43,9 +43,16 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
   .content-area { padding: 20px 24px; }
   .grid-stats { grid-template-columns: repeat(3, 1fr) !important; }
   .grid-actions { grid-template-columns: repeat(2, 1fr) !important; }
+  
+  /* On tablet, widen the app and remove phone shadows */
+  body > div > div > div {
+    max-width: 100% !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
 }
 
-/* Desktop: 1024px+ */
+/* Desktop: 1024px+ — hide inline bottom navs from app components */
 @media (min-width: 1024px) {
   .sidebar { display: flex; flex-direction: column; width: var(--nav-width); border-right: 1px solid var(--border); background: var(--card); position: fixed; top: 0; left: 0; bottom: 0; z-index: 40; }
   .main-content { margin-left: var(--nav-width); padding-bottom: 0; }
@@ -53,6 +60,29 @@ html, body { font-family: var(--font); background: var(--bg); color: var(--text)
   .content-area { padding: 24px 32px; }
   .top-bar-mobile { display: none !important; }
   .grid-stats { grid-template-columns: repeat(4, 1fr) !important; }
+  
+  /* Hide the inline bottom nav that each app renders (position absolute/fixed at bottom) */
+  .desktop-hide-bottom-nav > div > div:last-child {
+    display: none !important;
+  }
+  
+  /* Hide the mobile top bar on desktop — the sidebar replaces it */
+  .desktop-hide-bottom-nav > div > div:first-child {
+    display: none !important;
+  }
+  
+  /* Ensure the app content doesn't have phone-frame constraints on desktop */
+  .desktop-hide-bottom-nav > div {
+    max-width: 100% !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    min-height: 100vh;
+  }
+  
+  /* Remove bottom padding meant for bottom nav, give proper desktop padding */
+  .desktop-hide-bottom-nav > div > div:nth-child(2) {
+    padding: 24px 32px !important;
+  }
 }
 
 /* Animations */
