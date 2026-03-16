@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --bg: #F8FAFC;
+  --card: #FFFFFF;
+  --text: #0F172A;
+  --text-muted: #64748B;
+  --text-faint: #94A3B8;
+  --border: #E2E8F0;
+  --border-soft: #F1F5F9;
+  --primary: #2563EB;
+  --primary-soft: #EFF6FF;
+  --accent: #7C3AED;
+  --accent-soft: #F3E8FF;
+  --success: #10B981;
+  --success-soft: #D1FAE5;
+  --warn: #F59E0B;
+  --warn-soft: #FEF3C7;
+  --error: #EF4444;
+  --error-soft: #FEE2E2;
+  --teal: #0D9488;
+  --teal-soft: #F0FDFA;
+  --nav-width: 240px;
+  --nav-collapsed: 72px;
+  --top-bar: 60px;
+  --bottom-nav: 72px;
+}
+
+html, body { font-family: var(--font); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; min-height: 100vh; }
+
+/* Responsive shell */
+.app-shell { display: flex; min-height: 100vh; }
+.sidebar { display: none; }
+.main-content { flex: 1; min-width: 0; padding-bottom: var(--bottom-nav); }
+.content-area { padding: 16px; max-width: 1280px; margin: 0 auto; }
+.bottom-nav { display: flex; }
+
+/* Tablet: 768px+ */
+@media (min-width: 768px) {
+  .content-area { padding: 20px 24px; }
+  .grid-stats { grid-template-columns: repeat(3, 1fr) !important; }
+  .grid-actions { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* Desktop: 1024px+ */
+@media (min-width: 1024px) {
+  .sidebar { display: flex; flex-direction: column; width: var(--nav-width); border-right: 1px solid var(--border); background: var(--card); position: fixed; top: 0; left: 0; bottom: 0; z-index: 40; }
+  .main-content { margin-left: var(--nav-width); padding-bottom: 0; }
+  .bottom-nav { display: none !important; }
+  .content-area { padding: 24px 32px; }
+  .top-bar-mobile { display: none !important; }
+  .grid-stats { grid-template-columns: repeat(4, 1fr) !important; }
+}
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+@keyframes confetti { 0% { transform: translateY(-20px) rotate(0); opacity: 1; } 100% { transform: translateY(420px) rotate(720deg); opacity: 0; } }
+@keyframes xpPop { 0% { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.8); } 20% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.05); } 100% { opacity: 0; transform: translateX(-50%) translateY(-30px); } }
+@keyframes navGlow { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+@keyframes mol { 0% { transform: translateY(0); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0); } }
+@keyframes escape { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-60px); } }
+
+/* PWA safe areas */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .bottom-nav { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+}
+
+/* Scrollbar styling */
+.content-scroll::-webkit-scrollbar { width: 6px; }
+.content-scroll::-webkit-scrollbar-track { background: transparent; }
+.content-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
