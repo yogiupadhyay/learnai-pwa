@@ -46,62 +46,189 @@ const HomeScreen=({navigate,xp,streak})=><div style={{display:"flex",flexDirecti
   </div>
 </div>;
 
-/* ============ TUTOR WITH ANIMATION + READ ALOUD ============ */
-const TutorScreen=({navigate,addXP})=>{const[step,setStep]=useState(0);const[input,setInput]=useState("");const[reading,setReading]=useState(false);
-const cards=[
-  {type:"animation",icon:"play",label:"Watch",color:"#06B6D4",bg:"#ECFEFF",content:"See how evaporation works:",hasAnimation:true},
-  {type:"concept",icon:"spark",label:"Concept",color:C.primary,bg:C.primarySoft,content:"When a liquid evaporates, the fastest (highest-energy) molecules escape. The remaining molecules have less energy on average — so the liquid temperature drops."},
-  {type:"think",icon:"brain",label:"Think",color:C.accent,bg:C.accentSoft,content:"After the fastest molecules leave, what happens to the temperature of the remaining liquid?",hasInput:true},
-  {type:"feedback",icon:"check",label:"Correct",color:C.success,bg:C.successSoft,content:"Yes! Average kinetic energy drops → temperature decreases. This is evaporative cooling."},
-  {type:"practice",icon:"target",label:"Your turn",color:C.warn,bg:C.warnSoft,content:"Why does a fan make you feel cooler even though it doesn't lower room temperature?",hasInput:true},
-];
+/* ============ VISUAL EXPLAINERS ============ */
+const FractionBarExplainer=()=>{
+  const[playing,setPlaying]=useState(true);const[phase,setPhase]=useState(0);const[audio,setAudio]=useState(false);
+  const narrations=["We start with 3/4 and 1/2","To add fractions, we need common denominators","Convert 1/2 to 2/4 — now both bars show fourths","3/4 + 2/4 = 5/4, which is 1 and 1/4"];
+  useEffect(()=>{if(!playing)return;const t=setInterval(()=>setPhase(p=>p<3?p+1:0),2200);return()=>clearInterval(t);},[playing]);
+  useEffect(()=>{if(audio&&'speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(narrations[phase]);u.rate=0.9;speechSynthesis.speak(u);}return()=>{if(audio)speechSynthesis.cancel();};},[phase,audio]);
+  const barH=28,gap=6,colors={a:"#7C3AED",b:"#2563EB",merged:"#10B981"};
+  return <div style={{background:"#0F172A",borderRadius:14,padding:16,position:"relative",overflow:"hidden"}}>
+    <style>{`@keyframes fracSlide{0%{transform:translateX(-8px);opacity:0}100%{transform:translateX(0);opacity:1}} @keyframes fracMerge{0%{gap:16px}100%{gap:0}} @keyframes fracPulse{0%,100%{opacity:1}50%{opacity:0.6}}`}</style>
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
+      <span style={{fontSize:11,color:"#94A3B8",fontWeight:600}}>FRACTION ADDITION: 3/4 + 1/2</span>
+      <div style={{display:"flex",gap:6}}>
+        <button onClick={()=>setAudio(!audio)} style={{width:28,height:28,borderRadius:8,background:audio?"#7C3AED30":"#1E293B",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><I n="volume" s={14} c={audio?"#A78BFA":"#64748B"}/></button>
+        <button onClick={()=>setPlaying(!playing)} style={{width:28,height:28,borderRadius:8,background:playing?"#7C3AED30":"#1E293B",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><I n={playing?"clock":"play"} s={14} c={playing?"#A78BFA":"#64748B"}/></button>
+      </div>
+    </div>
+    {/* Phase 0&1: Original fractions */}
+    <div style={{minHeight:140,display:"flex",flexDirection:"column",justifyContent:"center",gap:14}}>
+      {/* 3/4 bar */}
+      <div>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+          <span style={{fontSize:13,color:"#E2E8F0",fontWeight:700,width:32}}>3/4</span>
+          <div style={{flex:1,display:"flex",gap:2,height:barH,borderRadius:6,overflow:"hidden",border:"1px solid #334155"}}>
+            {[0,1,2,3].map(i=><div key={i} style={{flex:1,background:i<3?colors.a:"#1E293B",transition:"background 0.5s"}}/>)}
+          </div>
+        </div>
+      </div>
+      {/* 1/2 bar — transforms to 2/4 in phase 2 */}
+      <div>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+          <span style={{fontSize:13,color:"#E2E8F0",fontWeight:700,width:32}}>{phase>=2?"2/4":"1/2"}</span>
+          <div style={{flex:1,display:"flex",gap:2,height:barH,borderRadius:6,overflow:"hidden",border:"1px solid #334155"}}>
+            {phase<2?[0,1].map(i=><div key={i} style={{flex:1,background:i<1?colors.b:"#1E293B",transition:"background 0.5s"}}/>)
+            :[0,1,2,3].map(i=><div key={i} style={{flex:1,background:i<2?colors.b:"#1E293B",transition:"background 0.5s",animation:"fracSlide 0.4s ease forwards",animationDelay:`${i*0.1}s`}}/>)}
+          </div>
+        </div>
+      </div>
+      {/* Phase 3: Merged result = 5/4 */}
+      {phase>=3&&<div style={{animation:"fracSlide 0.5s ease forwards"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+          <span style={{fontSize:13,color:"#10B981",fontWeight:700,width:32}}>5/4</span>
+          <div style={{flex:1,display:"flex",gap:2,height:barH,borderRadius:6,overflow:"hidden",border:"1px solid #10B98150"}}>
+            {[0,1,2,3,4].map(i=><div key={i} style={{flex:1,background:i<3?colors.a:i<5?colors.b:"#1E293B",transition:"background 0.5s"}}/>)}
+          </div>
+          <span style={{fontSize:12,color:"#10B981",fontWeight:600}}>= 1 1/4</span>
+        </div>
+      </div>}
+      {/* Step indicator */}
+      <div style={{display:"flex",gap:4,justifyContent:"center",marginTop:4}}>
+        {[0,1,2,3].map(i=><div key={i} style={{width:i===phase?20:6,height:6,borderRadius:3,background:i===phase?"#A78BFA":"#334155",transition:"all 0.3s",cursor:"pointer"}} onClick={()=>{setPhase(i);setPlaying(false);}}/>)}
+      </div>
+      <p style={{fontSize:12,color:"#94A3B8",textAlign:"center",margin:"4px 0 0",minHeight:16}}>{narrations[phase]}</p>
+    </div>
+  </div>;
+};
+
+const BeakerConvectionExplainer=()=>{
+  const[playing,setPlaying]=useState(true);const[heatOn,setHeatOn]=useState(true);const[audio,setAudio]=useState(false);const[tick,setTick]=useState(0);
+  useEffect(()=>{if(!playing)return;const t=setInterval(()=>setTick(k=>k+1),80);return()=>clearInterval(t);},[playing]);
+  const narrate=(text)=>{if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=0.9;speechSynthesis.speak(u);}};
+  useEffect(()=>{if(audio)narrate(heatOn?"Heat is on. Hot particles rise, cool ones sink — creating a convection current.":"Heat is off. Particles slow down and settle. No convection current.");},[heatOn,audio]);
+  // 12 particles in a loop
+  const particles=Array.from({length:12},(_,i)=>{
+    const angle=(tick*(heatOn?1.2:0.15)+i*30)*(Math.PI/180);
+    const rx=35+i*3,ry=40;
+    const cx=75+Math.sin(angle+i*0.5)*rx;
+    const cy=70+Math.cos(angle+i*0.5)*ry*(heatOn?1:0.3);
+    const speed=heatOn?1:0.2;
+    const temp=heatOn?(Math.sin(angle+i)>0?1:0):0;
+    return{cx:Math.max(30,Math.min(170,cx)),cy:Math.max(24,Math.min(120,cy)),temp,r:heatOn?4.5:3.5};
+  });
+  return <div style={{background:"#0F172A",borderRadius:14,padding:16,position:"relative",overflow:"hidden"}}>
+    <style>{`@keyframes heatGlow{0%,100%{opacity:0.4}50%{opacity:0.9}} @keyframes bubble{0%{transform:translateY(0);opacity:0.8}100%{transform:translateY(-20px);opacity:0}}`}</style>
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+      <span style={{fontSize:11,color:"#94A3B8",fontWeight:600}}>CONVECTION CURRENT</span>
+      <div style={{display:"flex",gap:6}}>
+        <button onClick={()=>setAudio(!audio)} style={{width:28,height:28,borderRadius:8,background:audio?"#06B6D430":"#1E293B",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><I n="volume" s={14} c={audio?"#22D3EE":"#64748B"}/></button>
+        <button onClick={()=>setPlaying(!playing)} style={{width:28,height:28,borderRadius:8,background:playing?"#06B6D430":"#1E293B",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><I n={playing?"clock":"play"} s={14} c={playing?"#22D3EE":"#64748B"}/></button>
+      </div>
+    </div>
+    <div style={{display:"flex",gap:16,alignItems:"flex-start"}}>
+      <svg width="200" height="140" viewBox="0 0 200 140">
+        {/* Beaker */}
+        <rect x="20" y="15" width="160" height="110" rx="8" fill="#0C1929" stroke="#334155" strokeWidth="1.5"/>
+        {/* Heat source glow */}
+        {heatOn&&<rect x="20" y="115" width="160" height="10" rx="2" fill="#EF4444" style={{animation:"heatGlow 1.5s ease-in-out infinite"}}/>}
+        {/* Particles */}
+        {particles.map((p,i)=><circle key={i} cx={p.cx} cy={p.cy} r={p.r} fill={p.temp?"#EF4444":"#3B82F6"} style={{transition:"cx 0.15s, cy 0.15s, fill 0.5s, r 0.3s"}}/>)}
+        {/* Convection arrows */}
+        {heatOn&&<><path d="M50 95 L50 35" stroke="#EF444480" strokeWidth="1.2" fill="none" strokeDasharray="4 3" markerEnd="url(#arrUp)"/>
+        <path d="M150 35 L150 95" stroke="#3B82F680" strokeWidth="1.2" fill="none" strokeDasharray="4 3" markerEnd="url(#arrDn)"/>
+        <defs><marker id="arrUp" viewBox="0 0 6 6" refX="3" refY="3" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 6L3 0L6 6" fill="#EF444480"/></marker>
+        <marker id="arrDn" viewBox="0 0 6 6" refX="3" refY="3" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L3 6L6 0" fill="#3B82F680"/></marker></defs></>}
+        {/* Bubbles when heat on */}
+        {heatOn&&[0,1,2].map(i=><circle key={`b${i}`} cx={60+i*35} cy={110} r={2} fill="#EF444460" style={{animation:`bubble 1.${i+2}s ease-out ${i*0.4}s infinite`}}/>)}
+      </svg>
+      <div style={{flex:1,display:"flex",flexDirection:"column",gap:8,paddingTop:4}}>
+        <div style={{fontSize:11,color:"#94A3B8"}}>
+          {heatOn?<><span style={{color:"#EF4444"}}>●</span> Hot particles rise<br/><span style={{color:"#3B82F6"}}>●</span> Cool particles sink<br/><span style={{color:"#94A3B8",fontSize:10}}>→ creates a circular current</span></>
+          :<><span style={{color:"#3B82F6"}}>●</span> Particles settle<br/><span style={{color:"#94A3B8",fontSize:10}}>No heat = no convection</span></>}
+        </div>
+        {/* Heat toggle */}
+        <button onClick={()=>setHeatOn(!heatOn)} style={{marginTop:8,display:"flex",alignItems:"center",gap:8,padding:"8px 12px",borderRadius:10,border:"none",cursor:"pointer",fontFamily:"inherit",fontSize:12,fontWeight:600,background:heatOn?"#EF444425":"#1E293B",color:heatOn?"#FCA5A5":"#64748B",transition:"all 0.3s"}}>
+          <div style={{width:36,height:20,borderRadius:10,background:heatOn?"#EF4444":"#334155",position:"relative",transition:"background 0.3s"}}>
+            <div style={{width:16,height:16,borderRadius:8,background:"#fff",position:"absolute",top:2,left:heatOn?18:2,transition:"left 0.3s"}}/>
+          </div>
+          {heatOn?"Heat ON":"Heat OFF"}
+        </button>
+      </div>
+    </div>
+    <p style={{fontSize:12,color:"#94A3B8",textAlign:"center",margin:"8px 0 0"}}>{heatOn?"Warm fluid rises, cooler fluid sinks — forming a convection loop":"Toggle heat on to see the convection current in action"}</p>
+  </div>;
+};
+
+const VisualExplainerMap={
+  "fraction-bar":FractionBarExplainer,
+  "beaker":BeakerConvectionExplainer,
+};
+
+const WatchLearnBadge=()=><span style={{display:"inline-flex",alignItems:"center",gap:4,padding:"3px 10px",borderRadius:999,fontSize:10,fontWeight:700,background:"linear-gradient(135deg,#06B6D420,#7C3AED20)",color:"#06B6D4",border:"1px solid #06B6D430",letterSpacing:0.3}}>
+  <I n="play" s={10} c="#06B6D4" w={2.2}/>WATCH & LEARN
+</span>;
+
+/* ============ TUTOR WITH VISUAL EXPLAINERS + READ ALOUD ============ */
+const TutorScreen=({navigate,addXP})=>{const[step,setStep]=useState(0);const[input,setInput]=useState("");const[reading,setReading]=useState(false);const[topic,setTopic]=useState(null);
+const topics={
+  fractions:{
+    title:"Fractions — Adding Unlike Denominators",subtitle:"3/4 + 1/2",
+    cards:[
+      {type:"visual_explainer",icon:"play",label:"Watch",color:"#06B6D4",bg:"#ECFEFF",content:"Watch how we add 3/4 + 1/2 by finding common denominators:",visual:{type:"animation",component:"fraction-bar",props:{}}},
+      {type:"concept",icon:"spark",label:"Key Idea",color:C.primary,bg:C.primarySoft,content:"To add fractions with different denominators, first convert them so both have the same denominator. Multiply top and bottom of each fraction until the bottoms match. Here: 1/2 = 2/4, so 3/4 + 2/4 = 5/4."},
+      {type:"think",icon:"brain",label:"Think",color:C.accent,bg:C.accentSoft,content:"What would you multiply 1/3 by to get a denominator of 12?",hasInput:true},
+      {type:"feedback",icon:"check",label:"Correct",color:C.success,bg:C.successSoft,content:"Multiply by 4/4. Since 3 × 4 = 12, we get 1/3 = 4/12. Always multiply top and bottom by the same number!"},
+      {type:"practice",icon:"target",label:"Your turn",color:C.warn,bg:C.warnSoft,content:"Solve: 2/3 + 1/6. What is the answer in simplest form?",hasInput:true},
+    ]
+  },
+  evaporation:{
+    title:"Evaporation & Cooling",subtitle:"Convection & heat transfer",
+    cards:[
+      {type:"visual_explainer",icon:"play",label:"Watch",color:"#06B6D4",bg:"#ECFEFF",content:"See how heat creates convection currents in a fluid:",visual:{type:"animation",component:"beaker",props:{}}},
+      {type:"concept",icon:"spark",label:"Concept",color:C.primary,bg:C.primarySoft,content:"When a liquid is heated, the fastest (highest-energy) molecules rise. Cooler, denser molecules sink to take their place. This creates a circular flow called a convection current."},
+      {type:"think",icon:"brain",label:"Think",color:C.accent,bg:C.accentSoft,content:"After the fastest molecules leave a liquid surface, what happens to the temperature of the remaining liquid?",hasInput:true},
+      {type:"feedback",icon:"check",label:"Correct",color:C.success,bg:C.successSoft,content:"Yes! Average kinetic energy drops → temperature decreases. This is evaporative cooling — the same reason you feel cold stepping out of a pool."},
+      {type:"practice",icon:"target",label:"Your turn",color:C.warn,bg:C.warnSoft,content:"Why does a fan make you feel cooler even though it doesn't lower room temperature?",hasInput:true},
+    ]
+  },
+};
+// topic picker or active session
+if(!topic)return <div style={{display:"flex",flexDirection:"column",gap:14}}>
+  <div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>navigate("home")}/><div style={{flex:1}}><p style={{fontSize:12,color:C.textMuted,margin:0}}>Solve with Tutor</p><p style={{fontSize:18,fontWeight:800,color:C.text,margin:0}}>Choose a Topic</p></div></div>
+  {Object.entries(topics).map(([key,t])=><Card key={key} onClick={()=>setTopic(key)} style={{cursor:"pointer",borderLeft:`4px solid ${key==="fractions"?C.accent:C.primary}`,borderRadius:"4px 20px 20px 4px",padding:16}}>
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+      <div><p style={{fontSize:15,fontWeight:700,color:C.text,margin:"0 0 2px"}}>{t.title}</p><p style={{fontSize:12,color:C.textMuted,margin:0}}>{t.subtitle} • {t.cards.length} steps</p></div>
+      <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4}}>
+        <Pill icon="star" text={`+${t.cards.length*5} XP`} color={C.xp} bg={C.warnSoft}/>
+        {t.cards.some(c=>c.visual)&&<WatchLearnBadge/>}
+      </div>
+    </div>
+  </Card>)}
+</div>;
+
+const tp=topics[topic];const cards=tp.cards;
 const adv=()=>{if(step<cards.length-1){setStep(s=>s+1);setInput("");addXP(5);}};
 const readAloud=(text)=>{if('speechSynthesis' in window){setReading(true);const u=new SpeechSynthesisUtterance(text);u.rate=0.9;u.onend=()=>setReading(false);speechSynthesis.cancel();speechSynthesis.speak(u);}};
 return <div style={{display:"flex",flexDirection:"column",gap:14}}>
-  <div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>navigate("home")}/><div style={{flex:1}}><p style={{fontSize:12,color:C.textMuted,margin:0}}>Solve with Tutor</p><p style={{fontSize:15,fontWeight:700,color:C.text,margin:0}}>Evaporation & Cooling</p></div><Pill icon="star" text="+5/step" color={C.xp} bg={C.warnSoft}/></div>
+  <div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>{setTopic(null);setStep(0);}}/><div style={{flex:1}}><p style={{fontSize:12,color:C.textMuted,margin:0}}>Solve with Tutor</p><p style={{fontSize:15,fontWeight:700,color:C.text,margin:0}}>{tp.title}</p></div><Pill icon="star" text="+5/step" color={C.xp} bg={C.warnSoft}/></div>
   <div style={{display:"flex",gap:3}}>{cards.map((_,i)=><div key={i} style={{flex:1,height:4,borderRadius:2,background:i<=step?C.accent:C.border,transition:"background 0.3s"}}/>)}</div>
-  {cards.slice(0,step+1).map((c,i)=>(
-    <Card key={i} style={{borderLeft:`4px solid ${c.color}`,borderRadius:"4px 20px 20px 4px",padding:18}}>
+  {cards.slice(0,step+1).map((c,i)=>{
+    const ExplainerComp=c.visual?VisualExplainerMap[c.visual.component]:null;
+    return <Card key={i} style={{borderLeft:`4px solid ${c.color}`,borderRadius:"4px 20px 20px 4px",padding:18}}>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <span style={{width:28,height:28,borderRadius:8,background:c.bg,display:"flex",alignItems:"center",justifyContent:"center"}}><I n={c.icon} s={16} c={c.color}/></span>
           <span style={{fontSize:11,fontWeight:700,color:c.color,textTransform:"uppercase",letterSpacing:0.5}}>{c.label}</span>
+          {c.visual&&<WatchLearnBadge/>}
         </div>
-        {/* READ ALOUD button */}
-        {c.content&&!c.hasAnimation&&<button onClick={()=>readAloud(c.content)} style={{width:32,height:32,borderRadius:8,background:reading?`${C.accent}15`:C.borderSoft,border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><I n="volume" s={16} c={reading?C.accent:C.textMuted}/></button>}
+        {c.content&&!c.visual&&<button onClick={()=>readAloud(c.content)} style={{width:32,height:32,borderRadius:8,background:reading?`${C.accent}15`:C.borderSoft,border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><I n="volume" s={16} c={reading?C.accent:C.textMuted}/></button>}
       </div>
-
-      {/* MICRO ANIMATION for visual topics */}
-      {c.hasAnimation&&(
-        <div style={{background:"#0F172A",borderRadius:14,padding:16,marginBottom:12,position:"relative",overflow:"hidden",height:160}}>
-          <style>{`@keyframes mol{0%{transform:translateY(0)}50%{transform:translateY(-8px)}100%{transform:translateY(0)}} @keyframes escape{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-60px)}} @keyframes coolDown{0%{background:#EF4444}100%{background:#3B82F6}}`}</style>
-          {/* Animated beaker with molecules */}
-          <svg width="100%" height="100%" viewBox="0 0 300 140">
-            <rect x="80" y="40" width="140" height="90" rx="6" fill="#1E3A5F" stroke="#3B82F6" strokeWidth="1.5"/>
-            <text x="150" y="24" textAnchor="middle" fill="#94A3B8" fontSize="11" fontFamily="inherit">Evaporation cooling</text>
-            {/* Fast molecules escaping */}
-            <circle cx="120" cy="60" r="5" fill="#EF4444" style={{animation:"escape 2s ease-out infinite"}}/>
-            <circle cx="160" cy="55" r="5" fill="#F97316" style={{animation:"escape 2.3s ease-out 0.5s infinite"}}/>
-            <circle cx="185" cy="62" r="5" fill="#EF4444" style={{animation:"escape 1.8s ease-out 1s infinite"}}/>
-            {/* Slower molecules staying */}
-            <circle cx="110" cy="100" r="5" fill="#3B82F6" style={{animation:"mol 1.5s ease-in-out infinite"}}/>
-            <circle cx="135" cy="108" r="5" fill="#60A5FA" style={{animation:"mol 1.8s ease-in-out 0.3s infinite"}}/>
-            <circle cx="160" cy="102" r="5" fill="#3B82F6" style={{animation:"mol 2s ease-in-out 0.6s infinite"}}/>
-            <circle cx="185" cy="110" r="5" fill="#60A5FA" style={{animation:"mol 1.6s ease-in-out 0.9s infinite"}}/>
-            <circle cx="148" cy="115" r="5" fill="#3B82F6" style={{animation:"mol 1.9s ease-in-out 0.4s infinite"}}/>
-            {/* Arrows showing escape */}
-            <text x="240" y="50" fill="#EF4444" fontSize="10" fontFamily="inherit">Fast molecules</text>
-            <text x="240" y="64" fill="#EF4444" fontSize="10" fontFamily="inherit">escape ↑</text>
-            <text x="240" y="100" fill="#60A5FA" fontSize="10" fontFamily="inherit">Slow ones</text>
-            <text x="240" y="114" fill="#60A5FA" fontSize="10" fontFamily="inherit">stay → cooler</text>
-          </svg>
-        </div>
-      )}
-
-      {!c.hasAnimation&&<p style={{fontSize:14,color:C.text,margin:0,lineHeight:1.65}}>{c.content}</p>}
+      {c.content&&<p style={{fontSize:14,color:C.text,margin:"0 0 12px",lineHeight:1.65}}>{c.content}</p>}
+      {ExplainerComp&&<ExplainerComp {...(c.visual.props||{})}/>}
       {c.hasInput&&i===step&&<div style={{marginTop:12}}><textarea value={input} onChange={e=>setInput(e.target.value)} placeholder="Type your answer..." style={{width:"100%",minHeight:56,padding:"10px 14px",borderRadius:12,border:`1.5px solid ${C.border}`,fontFamily:"inherit",fontSize:13,resize:"vertical",boxSizing:"border-box",outline:"none"}}/><Btn variant="accent" onClick={adv} style={{marginTop:8,height:40,fontSize:13}}>Submit</Btn></div>}
-    </Card>
-  ))}
+    </Card>;
+  })}
   {step<cards.length-1&&!cards[step].hasInput&&<Btn full onClick={adv} variant="accent">Continue</Btn>}
 </div>;};
 
