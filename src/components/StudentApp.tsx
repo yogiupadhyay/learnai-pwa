@@ -180,7 +180,7 @@ const WatchLearnBadge=()=><span style={{display:"inline-flex",alignItems:"center
 </span>;
 
 /* ============ TUTOR WITH VISUAL EXPLAINERS + READ ALOUD ============ */
-const TutorScreen=({navigate,addXP})=>{const[step,setStep]=useState(0);const[input,setInput]=useState("");const[reading,setReading]=useState(false);const[topic,setTopic]=useState(null);const[persona,setPersona]=useState("textbook");const[realWorldOpen,setRealWorldOpen]=useState({});
+const TutorScreen=({navigate,addXP,ctx})=>{const[step,setStep]=useState(0);const[input,setInput]=useState("");const[reading,setReading]=useState(false);const[topic,setTopic]=useState(ctx?.topicKey||null);const[persona,setPersona]=useState("textbook");const[realWorldOpen,setRealWorldOpen]=useState({});
 const personaLabels={textbook:"Textbook",cricket:"Like cricket",story:"Like a story",game:"Like a game",cooking:"Like cooking",likeImFive:"Like I'm 5"};
 const personaContent={
   fractions:{
@@ -378,40 +378,105 @@ return <div style={{display:"flex",flexDirection:"column",gap:16,position:"relat
   {!checked?<Btn full onClick={chk} variant="primary">Check Answer</Btn>:<Btn full onClick={next} variant="accent">{qi<total-1?"Next Question":"See Results"}</Btn>}
 </div>;};
 
-/* ============ JOURNEY WITH GROWTH VIEW ============ */
-const JourneyScreen=({navigate})=>{const[exp,setExp]=useState("heat");const[viewMode,setViewMode]=useState("growth");
-const chs=[{id:"heat",name:"Heat",subj:"Science",m:80,start:45,topics:[{name:"Temperature",l:"mastered",s:92,start:60},{name:"Conduction",l:"practicing",s:65,start:30},{name:"Convection",l:"weak",s:32,start:8}]},{id:"light",name:"Light",subj:"Science",m:40,start:15,topics:[{name:"Reflection",l:"practicing",s:55,start:20},{name:"Refraction",l:"weak",s:28,start:5}]},{id:"fractions",name:"Fractions",subj:"Math",m:55,start:25,topics:[{name:"Like Fractions",l:"mastered",s:88,start:50},{name:"Unlike Fractions",l:"practicing",s:62,start:22},{name:"Mixed Numbers",l:"weak",s:35,start:10}]}];
+/* ============ JOURNEY WITH 3-STEP LEARNING PATH ============ */
+const JourneyScreen=({navigate,topicProgress,setTopicProgress})=>{
+const journeyTopics=[
+  {key:"fractions",name:"Fractions — Unlike Denominators",subject:"Math",chapter:"Chapter 3",teacher:"Ms. Sharma",mastery:62},
+  {key:"evaporation",name:"Evaporation & Cooling",subject:"Science",chapter:"Chapter 4",teacher:"Mr. Patel",mastery:45},
+  {key:"temperature",name:"Temperature & Heat",subject:"Science",chapter:"Chapter 5",teacher:"Mr. Patel",mastery:28},
+  {key:"multiplication",name:"Multiplication Tricks",subject:"Math",chapter:"Chapter 4",teacher:"Ms. Sharma",mastery:15},
+  {key:"light",name:"Light & Shadows",subject:"Science",chapter:"Chapter 6",teacher:"Mr. Patel",mastery:0},
+];
+
+const isUpcoming=(t)=>t.key==="light";
+const firstNotDone=journeyTopics.find(t=>topicProgress[t.key]?.learn!=="done"&&!isUpcoming(t));
+
+const stepPillStyle=(status,type,practiceCount)=>{
+  if(type==="practice"){
+    const bg=practiceCount>=7?C.successSoft:practiceCount>0?C.warnSoft:C.borderSoft;
+    const color=practiceCount>=7?C.success:practiceCount>0?C.warnDark:C.textFaint;
+    const border=practiceCount>=7?C.success:practiceCount>0?C.warn:C.border;
+    return {background:bg,color,border:`1.5px solid ${border}`,borderRadius:999,padding:"6px 12px",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",display:"inline-flex",alignItems:"center",gap:4,transition:"all 0.2s"};
+  }
+  const styles={
+    "not-started":{background:"transparent",color:C.textFaint,border:`1.5px solid ${C.border}`,borderRadius:999,padding:"6px 12px",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit",display:"inline-flex",alignItems:"center",gap:4,transition:"all 0.2s"},
+    "in-progress":{background:`${C.primary}12`,color:C.primary,border:`1.5px solid ${C.primary}40`,borderRadius:999,padding:"6px 12px",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",display:"inline-flex",alignItems:"center",gap:4,transition:"all 0.2s"},
+    "done":{background:C.successSoft,color:C.success,border:`1.5px solid ${C.success}`,borderRadius:999,padding:"6px 12px",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",display:"inline-flex",alignItems:"center",gap:4,transition:"all 0.2s"},
+    "ready":{background:`${C.accent}10`,color:C.accent,border:`1.5px solid ${C.accent}60`,borderRadius:999,padding:"6px 12px",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",display:"inline-flex",alignItems:"center",gap:4,transition:"all 0.2s",boxShadow:`0 0 8px ${C.accent}25`},
+  };
+  return styles[status]||styles["not-started"];
+};
+
+const stepIcon=(status,type,practiceCount)=>{
+  if(type==="practice")return `${practiceCount}/10`;
+  if(status==="done")return "✓";
+  if(status==="in-progress")return "●";
+  if(status==="ready")return "→";
+  return "";
+};
+
 return <div style={{display:"flex",flexDirection:"column",gap:16}}>
   <h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Your Journey</h1>
-  {/* GROWTH vs CURRENT toggle */}
-  <div style={{display:"flex",background:C.borderSoft,borderRadius:12,padding:3}}>
-    {[{id:"growth",label:"My Growth"},{id:"current",label:"Current Level"}].map(v=>(
-      <button key={v.id} onClick={()=>setViewMode(v.id)} style={{flex:1,height:36,borderRadius:10,border:"none",cursor:"pointer",fontFamily:"inherit",fontSize:13,fontWeight:600,background:viewMode===v.id?C.card:"transparent",color:viewMode===v.id?C.primary:C.textMuted,boxShadow:viewMode===v.id?"0 1px 3px rgba(0,0,0,0.08)":"none"}}>{v.label}</button>
-    ))}
-  </div>
 
+  {/* Overall mastery summary */}
   <Card style={{display:"flex",alignItems:"center",gap:20,background:"linear-gradient(135deg, #059669, #10B981)",border:"none",color:"#fff"}}>
-    <Ring value={viewMode==="growth"?62-30:62} size={72} stroke={5} color="#fff"><span style={{fontSize:18,fontWeight:800,color:"#fff"}}>{viewMode==="growth"?"+32%":"62%"}</span></Ring>
-    <div><p style={{fontSize:15,fontWeight:700,margin:"0 0 4px"}}>{viewMode==="growth"?"Total Growth":"Overall Mastery"}</p><Pill text={viewMode==="growth"?"Since you started":"This week +4%"} bg="rgba(255,255,255,0.2)" color="#fff"/></div>
+    <Ring value={62} size={72} stroke={5} color="#fff"><span style={{fontSize:18,fontWeight:800,color:"#fff"}}>62%</span></Ring>
+    <div><p style={{fontSize:15,fontWeight:700,margin:"0 0 4px"}}>Overall Mastery</p><Pill text="This week +4%" bg="rgba(255,255,255,0.2)" color="#fff"/></div>
   </Card>
 
-  {chs.map(ch=>{const mc=ch.m>=70?C.success:ch.m>=40?C.warn:C.error;const mb=ch.m>=70?C.successSoft:ch.m>=40?C.warnSoft:C.errorSoft;const delta=ch.m-ch.start;return(
-    <Card key={ch.id} style={{padding:0,overflow:"hidden"}}>
-      <button onClick={()=>setExp(exp===ch.id?null:ch.id)} style={{display:"flex",alignItems:"center",gap:14,width:"100%",padding:"14px 18px",background:"transparent",border:"none",cursor:"pointer",fontFamily:"inherit"}}>
-        <div style={{width:40,height:40,borderRadius:12,background:mb,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:800,color:mc}}>{viewMode==="growth"?`+${delta}%`:`${ch.m}%`}</div>
-        <div style={{flex:1,textAlign:"left"}}><p style={{fontSize:14,fontWeight:700,color:C.text,margin:0}}>{ch.name}</p>
-          {viewMode==="growth"&&<p style={{fontSize:11,color:C.success,margin:"2px 0 0"}}>{ch.start}% → {ch.m}%</p>}
-          {viewMode==="current"&&<p style={{fontSize:11,color:C.textMuted,margin:"2px 0 0"}}>{ch.subj}</p>}
-        </div><I n="chevD" s={18} c={C.textMuted}/>
-      </button>
-      {exp===ch.id&&<div style={{padding:"0 18px 14px"}}>{ch.topics.map((t,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 0",borderTop:i?`1px solid ${C.borderSoft}`:"none"}}>
-        <Dot level={t.l}/><span style={{fontSize:13,color:C.text,flex:1}}>{t.name}</span>
-        {viewMode==="growth"?<span style={{fontSize:11,color:C.success,marginRight:6}}>+{t.s-t.start}%</span>:<span style={{fontSize:11,color:C.textMuted,marginRight:6}}>{t.s}%</span>}
-        {t.s>=60&&<Pill text="Teach it" color={C.accent} bg={C.accentSoft} style={{cursor:"pointer",fontSize:11,padding:"3px 10px"}} onClick={()=>navigate("teachback")}/>}
-        <Btn variant="small" onClick={()=>navigate("quiz")}>Practice</Btn>
-      </div>)}</div>}
-    </Card>
-  );})}
+  {/* Topic cards */}
+  {journeyTopics.map(t=>{
+    const prog=topicProgress[t.key]||{learn:"not-started",teach:"not-started",practice:0};
+    const upcoming=isUpcoming(t);
+    const isRecommended=firstNotDone&&firstNotDone.key===t.key;
+    const mc=t.mastery>=60?C.success:t.mastery>=30?C.warn:C.error;
+    const allDone=prog.learn==="done"&&(prog.teach==="done"||prog.teach==="ready")&&prog.practice>=7;
+
+    return <Card key={t.key} style={{
+      padding:18,
+      opacity:upcoming?0.6:1,
+      ...(isRecommended?{border:`2px solid ${C.primary}`,boxShadow:`0 0 12px ${C.primary}15`}:{}),
+      position:"relative",
+    }}>
+      {/* Recommended badge */}
+      {isRecommended&&<div style={{position:"absolute",top:-10,right:16}}><span style={{display:"inline-flex",alignItems:"center",gap:4,padding:"3px 10px",borderRadius:999,fontSize:10,fontWeight:700,background:C.primary,color:"#fff",boxShadow:"0 2px 8px rgba(37,99,235,0.3)"}}>Recommended</span></div>}
+      {/* Coming soon label */}
+      {upcoming&&<div style={{position:"absolute",top:-10,right:16}}><span style={{display:"inline-flex",alignItems:"center",gap:4,padding:"3px 10px",borderRadius:999,fontSize:10,fontWeight:700,background:C.borderSoft,color:C.textMuted}}>Coming soon</span></div>}
+
+      {/* Top: Topic info + mastery */}
+      <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:12}}>
+        <div style={{flex:1}}>
+          <p style={{fontSize:15,fontWeight:700,color:C.text,margin:"0 0 4px"}}>{t.name}</p>
+          <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+            <Pill text={t.subject} color={t.subject==="Math"?C.accent:C.primary} bg={t.subject==="Math"?C.accentSoft:C.primarySoft}/>
+            <Pill text={t.chapter} color={C.textMuted} bg={C.borderSoft}/>
+          </div>
+        </div>
+        <Ring value={t.mastery} size={48} stroke={4} color={mc}><span style={{fontSize:12,fontWeight:800,color:mc}}>{t.mastery}%</span></Ring>
+      </div>
+
+      {/* Middle: 3 step pills */}
+      <div style={{display:"flex",gap:8,marginBottom:14}}>
+        <button onClick={()=>!upcoming&&navigate("tutor",{topicKey:t.key,topicName:t.name})} style={stepPillStyle(prog.learn,"learn")}>
+          <span>📖</span> Learn {stepIcon(prog.learn,"learn")}
+        </button>
+        <button onClick={()=>!upcoming&&navigate("teachback",{topicKey:t.key,topicName:t.name})} style={stepPillStyle(prog.teach,"teach")}>
+          <span>🧠</span> Teach {stepIcon(prog.teach,"teach")}
+        </button>
+        <button onClick={()=>!upcoming&&navigate("practice",{topicKey:t.key,topicName:t.name})} style={stepPillStyle(prog.practice>=7?"done":prog.practice>0?"in-progress":"not-started","practice",prog.practice)}>
+          <span>⚡</span> Practice {stepIcon(null,"practice",prog.practice)}
+        </button>
+      </div>
+
+      {/* Bottom: Mastery bar */}
+      <Bar value={t.mastery} max={100} color={mc} h={5}/>
+
+      {/* Full path bonus indicator */}
+      {allDone&&<div style={{marginTop:10,padding:"6px 12px",borderRadius:10,background:"linear-gradient(135deg, #F59E0B20, #7C3AED20)",display:"flex",alignItems:"center",gap:6}}>
+        <I n="trophy" s={14} c={C.xp}/><span style={{fontSize:11,fontWeight:700,color:C.xp}}>Full path complete! +50 XP bonus</span>
+      </div>}
+    </Card>;
+  })}
 </div>;};
 
 /* ============ CHALLENGE MODE + LEADERBOARD ============ */
@@ -451,19 +516,34 @@ const ChallengeScreen=({navigate})=>{
 };
 
 /* ============ TEACH IT BACK ============ */
-const TeachBackScreen=({navigate,addXP})=>{const[tbInput,setTbInput]=useState("");const[tbResult,setTbResult]=useState(null);
-const evaluate=(text)=>{const t=text.toLowerCase();if(t.includes("denominator")||t.includes("common"))return "green";if(t.includes("divide")||t.includes("top by bottom"))return "red";return "orange";};
+const TeachBackScreen=({navigate,addXP,ctx,topicProgress})=>{const[tbInput,setTbInput]=useState("");const[tbResult,setTbResult]=useState(null);
+const topicKey=ctx?.topicKey||"fractions";
+const topicName=ctx?.topicName||"Fractions";
+const[showNudge,setShowNudge]=useState(()=>{const prog=topicProgress?.[topicKey];return prog&&prog.learn!=="done";});
+const evaluate=(text)=>{const t=text.toLowerCase();if(t.includes("denominator")||t.includes("common")||t.includes("heat")||t.includes("evaporat")||t.includes("cool")||t.includes("multiply"))return "green";if(t.includes("divide")||t.includes("top by bottom"))return "red";return "orange";};
 const submit=()=>{if(!tbInput.trim())return;const r=evaluate(tbInput);setTbResult(r);addXP(20);};
-const resultMsg={green:{text:"Excellent explanation! You clearly understand the concept.",bg:C.successSoft,border:C.success,color:C.successDark,icon:"check"},red:{text:"Hmm, there might be a misconception. Dividing top by bottom isn't quite right for adding fractions.",bg:C.errorSoft,border:C.error,color:C.errorDark,icon:"alert"},orange:{text:"Good attempt! Try mentioning common denominators to make your explanation clearer.",bg:C.warnSoft,border:C.warn,color:C.warnDark,icon:"brain"}};
+const resultMsg={green:{text:"Excellent explanation! You clearly understand the concept.",bg:C.successSoft,border:C.success,color:C.successDark,icon:"check"},red:{text:"Hmm, there might be a misconception here. Review the topic and try again!",bg:C.errorSoft,border:C.error,color:C.errorDark,icon:"alert"},orange:{text:"Good attempt! Try adding more specific details to make your explanation clearer.",bg:C.warnSoft,border:C.warn,color:C.warnDark,icon:"brain"}};
 return <div style={{display:"flex",flexDirection:"column",gap:16}}>
   <div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>navigate("journey")}/><h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Teach it back</h1></div>
+  {/* Nudge if learn not done */}
+  {showNudge&&<Card style={{background:C.primarySoft,border:`1px solid ${C.primary}30`,padding:14,display:"flex",alignItems:"center",gap:10}}>
+    <span style={{fontSize:16}}>💡</span>
+    <div style={{flex:1}}>
+      <p style={{fontSize:13,fontWeight:600,color:C.primary,margin:0}}>Want to learn this first?</p>
+      <p style={{fontSize:11,color:C.textMuted,margin:"2px 0 0"}}>The Learn path can help you build a foundation before teaching.</p>
+    </div>
+    <div style={{display:"flex",gap:6,flexShrink:0}}>
+      <Btn variant="small" onClick={()=>navigate("tutor",{topicKey,topicName})} style={{fontSize:11,padding:"0 10px",height:32}}>Learn first</Btn>
+      <button onClick={()=>setShowNudge(false)} style={{padding:"6px 10px",borderRadius:10,border:`1px solid ${C.border}`,background:"transparent",cursor:"pointer",fontFamily:"inherit",fontSize:11,fontWeight:600,color:C.textMuted}}>Skip</button>
+    </div>
+  </Card>}
   <Card style={{background:C.accentSoft,border:`1px solid ${C.accent}30`,padding:20,textAlign:"center"}}>
     <svg width="48" height="48" viewBox="0 0 48 48" style={{margin:"0 auto 12px",display:"block"}}><circle cx="24" cy="24" r="22" fill="#E9D5FF" stroke="#7C3AED" strokeWidth="2"/><circle cx="17" cy="20" r="2" fill="#7C3AED"/><circle cx="31" cy="20" r="2" fill="#7C3AED"/><path d="M16 32 Q24 26 32 32" stroke="#7C3AED" strokeWidth="2" fill="none" strokeLinecap="round"/><text x="36" y="14" fontSize="14">?</text></svg>
-    <p style={{fontSize:15,fontWeight:700,color:C.accent,margin:"0 0 4px"}}>Pretend I'm your friend who doesn't understand Fractions.</p>
+    <p style={{fontSize:15,fontWeight:700,color:C.accent,margin:"0 0 4px"}}>Pretend I'm your friend who doesn't understand {topicName}.</p>
     <p style={{fontSize:13,color:C.textMuted,margin:0}}>Can you explain it to me?</p>
   </Card>
   {!tbResult&&<>
-    <textarea value={tbInput} onChange={e=>setTbInput(e.target.value)} placeholder="Explain fractions in your own words..." style={{width:"100%",minHeight:120,padding:"14px 16px",borderRadius:14,border:`1.5px solid ${C.border}`,fontFamily:"inherit",fontSize:14,resize:"vertical",boxSizing:"border-box",outline:"none",lineHeight:1.6,color:C.text}}/>
+    <textarea value={tbInput} onChange={e=>setTbInput(e.target.value)} placeholder={`Explain ${topicName.toLowerCase()} in your own words...`} style={{width:"100%",minHeight:120,padding:"14px 16px",borderRadius:14,border:`1.5px solid ${C.border}`,fontFamily:"inherit",fontSize:14,resize:"vertical",boxSizing:"border-box",outline:"none",lineHeight:1.6,color:C.text}}/>
     <Btn full onClick={submit} variant="accent" icon="send">Submit explanation</Btn>
   </>}
   {tbResult&&<>
@@ -663,19 +743,116 @@ return <div style={{position:"absolute",bottom:80,left:12,right:12,maxHeight:"60
   </div>
 </div>;};
 
+/* ============ PRACTICE SCREEN ============ */
+const practiceQuestions={
+  fractions:[
+    {q:"What is 3/4 + 1/2?",opts:["5/4","4/6","1","5/6"],correct:0},
+    {q:"Simplify: 6/8",opts:["3/4","2/4","6/4","1/2"],correct:0},
+    {q:"Which is greater: 2/3 or 3/5?",opts:["2/3","3/5","They are equal","Cannot compare"],correct:0},
+    {q:"What is 1/3 of 12?",opts:["4","3","6","2"],correct:0},
+    {q:"Convert 5/4 to mixed number:",opts:["1 1/4","1 1/2","1 3/4","2 1/4"],correct:0},
+  ],
+  evaporation:[
+    {q:"Evaporation causes cooling because:",opts:["Fastest molecules escape","Slowest molecules escape","All molecules leave","Water freezes"],correct:0},
+    {q:"Convection occurs in:",opts:["Liquids & gases","Solids only","Vacuum","All matter"],correct:0},
+    {q:"Why does a wet cloth cool you?",opts:["Evaporative cooling","Conduction","Radiation","Convection"],correct:0},
+    {q:"Heat travels through vacuum by:",opts:["Radiation","Conduction","Convection","All three"],correct:0},
+    {q:"Hot air rises because it is:",opts:["Less dense","More dense","Heavier","Colder"],correct:0},
+  ],
+  temperature:[
+    {q:"Temperature measures:",opts:["Average kinetic energy","Total energy","Weight","Volume"],correct:0},
+    {q:"Water boils at:",opts:["100°C","0°C","50°C","212°F only"],correct:0},
+    {q:"Heat flows from:",opts:["Hot to cold","Cold to hot","Equal temp","Random direction"],correct:0},
+    {q:"A thermometer works by:",opts:["Thermal expansion","Gravity","Magnetism","Electricity"],correct:0},
+    {q:"Which is hottest: 50°C, 100°F, 320K?",opts:["50°C","100°F","320K","All equal"],correct:2},
+  ],
+  multiplication:[
+    {q:"What is 12 × 15?",opts:["180","150","170","190"],correct:0},
+    {q:"9 × 11 = ?",opts:["99","89","101","109"],correct:0},
+    {q:"Which trick works for ×5?",opts:["Halve then ×10","Double then ×10","Add 5","Subtract 5"],correct:0},
+    {q:"25 × 4 = ?",opts:["100","75","125","80"],correct:0},
+    {q:"What is 8 × 7?",opts:["56","54","48","64"],correct:0},
+  ],
+  light:[
+    {q:"Light travels in:",opts:["Straight lines","Curves","Zigzags","Circles"],correct:0},
+    {q:"A shadow forms because:",opts:["Light can't pass through opaque objects","Light bends","Light is absorbed","Light reflects"],correct:0},
+    {q:"Which surface reflects light best?",opts:["Mirror","Black cloth","Wood","Paper"],correct:0},
+    {q:"Shadows are longest when the sun is:",opts:["Low in the sky","Directly overhead","Behind clouds","At noon"],correct:0},
+    {q:"Light from the sun reaches Earth by:",opts:["Radiation","Conduction","Convection","Evaporation"],correct:0},
+  ],
+};
+
+const PracticeScreen=({navigate,addXP,ctx,topicProgress,setTopicProgress})=>{
+  const topicKey=ctx?.topicKey||"fractions";
+  const topicName=ctx?.topicName||"Fractions";
+  const questions=practiceQuestions[topicKey]||practiceQuestions.fractions;
+  const[qi,setQi]=useState(0);const[sel,setSel]=useState(null);const[checked,setChecked]=useState(false);const[score,setScore]=useState(0);const[showConf,setShowConf]=useState(false);const[showXP,setShowXP]=useState(false);
+  const total=questions.length;const cur=questions[qi];const done=qi>=total;
+
+  const chk=()=>{if(sel===null)return;const correct=sel===cur.correct;setChecked(true);if(correct){setScore(s=>s+1);setShowConf(true);setShowXP(true);addXP(10);setTimeout(()=>{setShowConf(false);setShowXP(false);},1500);}};
+  const next=()=>{setChecked(false);setSel(null);setQi(q=>q+1);};
+
+  if(done){
+    const pct=Math.round((score/total)*100);
+    // Update topic progress practice count
+    const newProgress={...topicProgress};
+    if(newProgress[topicKey]){newProgress[topicKey]={...newProgress[topicKey],practice:score};}
+    if(topicProgress[topicKey]?.practice!==score)setTopicProgress(newProgress);
+    const lowScore=pct<40;
+    // Check if all 3 steps done for celebration
+    const tp=newProgress[topicKey];
+    const allDone=tp&&tp.learn==="done"&&(tp.teach==="done"||tp.teach==="ready")&&score>=7;
+    return <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:20,paddingTop:40,textAlign:"center",position:"relative"}}>
+      <Confetti show={true}/>
+      <Ring value={pct} size={120} stroke={8} color={pct>=70?C.success:C.warn}><span style={{fontSize:28,fontWeight:800,color:C.text}}>{pct}%</span></Ring>
+      <h2 style={{fontSize:22,fontWeight:800,color:C.text,margin:"0 0 6px"}}>{pct>=70?"Great job!":pct>=40?`${score} correct — nice progress!`:`${score} correct — keep going!`}</h2>
+      <p style={{fontSize:14,color:C.textMuted,margin:0}}>{score}/{total} correct</p>
+      <Pill icon="star" text={`+${score*10} XP`} color={C.xp} bg={C.warnSoft} style={{fontSize:16,padding:"8px 20px"}}/>
+      {lowScore&&<Card style={{background:C.primarySoft,border:`1px solid ${C.primary}30`,padding:14,width:"100%",textAlign:"left"}}>
+        <p style={{fontSize:13,color:C.primary,margin:0,lineHeight:1.5}}>Try the Learn path — it might help build a stronger foundation for this topic.</p>
+        <Btn variant="small" onClick={()=>navigate("tutor",{topicKey,topicName})} style={{marginTop:8}}>Go to Learn</Btn>
+      </Card>}
+      {allDone&&<Card style={{background:"linear-gradient(135deg, #F59E0B20, #7C3AED20)",border:`1px solid ${C.xp}40`,padding:16,width:"100%",textAlign:"center"}}>
+        <p style={{fontSize:15,fontWeight:800,color:C.xp,margin:0}}>Full path bonus: +50 XP</p>
+        <p style={{fontSize:12,color:C.textMuted,margin:"4px 0 0"}}>You completed Learn, Teach, and Practice!</p>
+      </Card>}
+      <div style={{display:"flex",gap:10,width:"100%"}}><Btn variant="ghost" onClick={()=>navigate("journey")} style={{flex:1}}>Back to Journey</Btn><Btn onClick={()=>{setQi(0);setScore(0);setSel(null);setChecked(false);}} style={{flex:1}}>Try Again</Btn></div>
+    </div>;
+  }
+
+  return <div style={{display:"flex",flexDirection:"column",gap:16,position:"relative"}}>
+    <Confetti show={showConf}/><XPToast show={showXP}/>
+    <div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>navigate("journey")}/><div style={{flex:1}}><p style={{fontSize:12,color:C.textMuted,margin:0}}>Practice</p><p style={{fontSize:15,fontWeight:700,color:C.text,margin:0}}>{topicName}</p></div><span style={{fontSize:13,fontWeight:700,color:C.text}}>{qi+1}/{total}</span><Pill icon="star" text={`${score*10}`} color={C.xp} bg={C.warnSoft}/></div>
+    <Bar value={qi+1} max={total} color={C.accent} h={5}/>
+    <h2 style={{fontSize:18,fontWeight:700,color:C.text,margin:0,lineHeight:1.5}}>{cur.q}</h2>
+    <div style={{display:"flex",flexDirection:"column",gap:10}}>
+      {cur.opts.map((o,i)=>{const isSel=sel===i,isCor=i===cur.correct;let bd=C.border,bg="transparent",tc=C.text,fw=400;if(checked&&isCor){bd=C.success;bg=C.successSoft;tc=C.successDark;fw=600}else if(checked&&isSel&&!isCor){bd=C.error;bg=C.errorSoft;tc=C.errorDark;fw=600}else if(!checked&&isSel){bd=C.primary;bg=C.primarySoft;fw=600}return <button key={i} onClick={()=>!checked&&setSel(i)} style={{display:"flex",alignItems:"center",gap:14,width:"100%",padding:"16px 18px",borderRadius:14,border:`2px solid ${bd}`,background:bg,cursor:checked?"default":"pointer",fontFamily:"inherit",fontSize:14,color:tc,fontWeight:fw,textAlign:"left"}}><div style={{width:28,height:28,borderRadius:"50%",border:`2px solid ${bd}`,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,background:checked&&isCor?C.success:checked&&isSel?C.error:isSel?C.primary:"transparent",color:(isSel||(checked&&isCor))?"#fff":C.textMuted}}>{checked&&isCor?<I n="check" s={14} c="#fff" w={3}/>:String.fromCharCode(65+i)}</div>{o}</button>;})}
+    </div>
+    {!checked?<Btn full onClick={chk} variant="primary">Check Answer</Btn>:<Btn full onClick={next} variant="accent">{qi<total-1?"Next Question":"See Results"}</Btn>}
+  </div>;
+};
+
 /* ============ APP SHELL ============ */
 export default function App(){
   const[onboarded,setOnboarded]=useState(false);const[screen,setScreen]=useState("home");const[xp,setXP]=useState(240);const[streak]=useState(3);const scrollRef=useRef(null);const[buddyOpen,setBuddyOpen]=useState(false);
+  const[screenCtx,setScreenCtx]=useState(null);
+  const[topicProgress,setTopicProgress]=useState({
+    fractions:{learn:"done",teach:"ready",practice:3},
+    evaporation:{learn:"in-progress",teach:"not-started",practice:0},
+    temperature:{learn:"not-started",teach:"not-started",practice:0},
+    multiplication:{learn:"not-started",teach:"not-started",practice:0},
+    light:{learn:"not-started",teach:"not-started",practice:0},
+  });
   const navigateRef=useRef(null);
-  const navigate=(s)=>{setOnboarded(true);setScreen(s);scrollRef.current?.scrollTo(0,0);};const addXP=(n)=>setXP(x=>x+n);
+  const navigate=(s,ctx)=>{setOnboarded(true);setScreen(s);setScreenCtx(ctx||null);scrollRef.current?.scrollTo(0,0);};const addXP=(n)=>setXP(x=>x+n);
   navigateRef.current=navigate;
   useEffect(()=>{const h=(e)=>navigateRef.current?.(e.detail);window.addEventListener('sidebar-nav',h);return()=>window.removeEventListener('sidebar-nav',h);},[]);
 
   if(!onboarded)return <div style={{fontFamily:'"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',maxWidth:"100%",margin:"0 auto",background:C.bg,minHeight:"100vh",borderRadius:0,overflow:"hidden",boxShadow:"none",position:"relative"}}><OnboardingScreen onComplete={()=>setOnboarded(true)}/></div>;
 
   const navItems=[{id:"home",icon:"home",label:"Home"},{id:"journey",icon:"journey",label:"Journey"},{id:"exam",icon:"exam",label:"Exams"},{id:"stories",icon:"gallery",label:"Feed"}];
-  const screens={home:<HomeScreen navigate={navigate} xp={xp} streak={streak}/>,quiz:<QuizScreen navigate={navigate} addXP={addXP}/>,tutor:<TutorScreen navigate={navigate} addXP={addXP}/>,journey:<JourneyScreen navigate={navigate}/>,revision:<RevisionScreen navigate={navigate}/>,booster:<BoosterScreen navigate={navigate} addXP={addXP}/>,photo:<PhotoScreen navigate={navigate}/>,exam:<ExamScreen navigate={navigate}/>,mistakes:<MistakeScreen navigate={navigate}/>,notifs:<NotifScreen navigate={navigate}/>,profile:<ProfileScreen navigate={navigate} xp={xp} streak={streak}/>,challenge:<ChallengeScreen navigate={navigate}/>,foundation:<FoundationScreen navigate={navigate}/>,teachback:<TeachBackScreen navigate={navigate} addXP={addXP}/>,stories:<StoriesScreen navigate={navigate}/>};
-  const activeNav=["quiz","tutor","booster","photo","mistakes","notifs","profile","challenge","foundation"].includes(screen)?"home":["teachback"].includes(screen)?"journey":screen;
+  const screens={home:<HomeScreen navigate={navigate} xp={xp} streak={streak}/>,quiz:<QuizScreen navigate={navigate} addXP={addXP}/>,tutor:<TutorScreen navigate={navigate} addXP={addXP} ctx={screenCtx}/>,journey:<JourneyScreen navigate={navigate} topicProgress={topicProgress} setTopicProgress={setTopicProgress}/>,revision:<RevisionScreen navigate={navigate}/>,booster:<BoosterScreen navigate={navigate} addXP={addXP}/>,photo:<PhotoScreen navigate={navigate}/>,exam:<ExamScreen navigate={navigate}/>,mistakes:<MistakeScreen navigate={navigate}/>,notifs:<NotifScreen navigate={navigate}/>,profile:<ProfileScreen navigate={navigate} xp={xp} streak={streak}/>,challenge:<ChallengeScreen navigate={navigate}/>,foundation:<FoundationScreen navigate={navigate}/>,teachback:<TeachBackScreen navigate={navigate} addXP={addXP} ctx={screenCtx} topicProgress={topicProgress}/>,stories:<StoriesScreen navigate={navigate}/>,practice:<PracticeScreen navigate={navigate} addXP={addXP} ctx={screenCtx} topicProgress={topicProgress} setTopicProgress={setTopicProgress}/>};
+  const activeNav=["quiz","tutor","booster","photo","mistakes","notifs","profile","challenge","foundation"].includes(screen)?"home":["teachback","practice"].includes(screen)?"journey":screen;
   const showBuddy=["home","journey","stories"].includes(screen);
 
   return <div style={{fontFamily:'"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',maxWidth:"100%",margin:"0 auto",background:C.bg,minHeight:"100vh",display:"flex",flexDirection:"column",borderRadius:0,overflow:"hidden",boxShadow:"none",position:"relative"}}>
