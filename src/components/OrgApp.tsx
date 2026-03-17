@@ -33,6 +33,7 @@ const Bar=({value,max=100,color=C.primary,h=6})=> <div style={{width:"100%",heig
 const Stat=({label,value,icon,color=C.primary,sub})=> <Card style={{padding:16,flex:1}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}><I n={icon} s={20} c={color}/>{sub&&<span style={{fontSize:11,color:sub.includes("+")?C.success:C.textMuted,fontWeight:600}}>{sub}</span>}</div><p style={{fontSize:22,fontWeight:800,color:C.text,margin:"0 0 2px"}}>{value}</p><p style={{fontSize:11,color:C.textMuted,margin:0}}>{label}</p></Card>;
 const Avatar=({name,size=36,color=C.primary})=> <div style={{width:size,height:size,borderRadius:"50%",background:`${color}15`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:size*0.38,fontWeight:700,color,flexShrink:0}}>{name[0].toUpperCase()}</div>;
 const Back=({onClick})=> <button onClick={onClick} style={{background:"transparent",border:"none",cursor:"pointer",padding:4,display:"flex",color:C.textMuted}}><I n="arrowL" s={22} c={C.textMuted}/></button>;
+const Ring=({value,max=100,size=64,stroke=5,color=C.primary,children})=>{const r=(size-stroke)/2,circ=2*Math.PI*r,off=circ-(value/max)*circ;return <div style={{position:"relative",width:size,height:size}}><svg width={size} height={size} style={{transform:"rotate(-90deg)"}}><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={`${color}20`} strokeWidth={stroke}/><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeDasharray={circ} strokeDashoffset={off} strokeLinecap="round" style={{transition:"stroke-dashoffset 0.6s ease"}}/></svg><div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>{children}</div></div>;};
 
 /* ============ DATA ============ */
 const org={name:"Delhi Public School",logo:"DPS",tagline:"Excellence in Education since 1949",board:"CBSE",color:"#1E40AF",students:420,teachers:18,classes:14,activeRate:78};
@@ -87,7 +88,7 @@ const DashboardScreen=({navigate})=> {
 
     {/* Class performance */}
     <div><p style={{fontSize:14,fontWeight:700,color:C.text,margin:"0 0 10px"}}>Class performance</p>
-      {classData.map((cl,i)=>{const mc=cl.mastery>=60?C.success:cl.mastery>=45?C.warn:C.error;return <Card key={i} style={{marginBottom:8,padding:14,display:"flex",alignItems:"center",gap:14}}>
+      {classData.map((cl,i)=>{const mc=cl.mastery>=60?C.success:cl.mastery>=45?C.warn:C.error;return <Card key={i} onClick={()=>navigate("classDetail",cl)} style={{marginBottom:8,padding:14,display:"flex",alignItems:"center",gap:14}}>
         <div style={{width:40,textAlign:"center"}}><p style={{fontSize:18,fontWeight:800,color:mc,margin:0}}>{cl.mastery}%</p></div>
         <div style={{flex:1}}>
           <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}><span style={{fontSize:13,fontWeight:600,color:C.text}}>{cl.name}</span><span style={{fontSize:11,color:C.textMuted}}>• {cl.teacher}</span></div>
@@ -114,7 +115,7 @@ const TeachersScreen=({navigate})=> {
   return <div style={{display:"flex",flexDirection:"column",gap:16}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Teachers</h1><Btn variant="primary" icon="plus">Add teacher</Btn></div>
 
-    {teachers.map((t,i)=> <Card key={i} style={{padding:16}}>
+    {teachers.map((t,i)=> <Card key={i} onClick={()=>navigate("teacherDetail",t)} style={{padding:16}}>
       <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:12}}>
         <Avatar name={t.name} size={44} color={t.active?C.teal:C.textFaint}/>
         <div style={{flex:1}}>
@@ -129,6 +130,225 @@ const TeachersScreen=({navigate})=> {
       </div>
       {t.weakTopic&&<p style={{fontSize:11,color:C.warn,margin:"8px 0 0"}}>Needs improvement: {t.weakTopic} (lowest teaching impact)</p>}
     </Card>)}
+  </div>;
+};
+
+/* ============ TEACHER DETAIL ============ */
+const TeacherDetailScreen=({navigate,teacher})=> {
+  const t=teacher||teachers[0];
+  const tClasses=classData.filter(cl=>cl.teacher.includes(t.name.split(" ")[1]||t.name));
+  const activeStudents=tClasses.reduce((s,cl)=>s+cl.active,0);
+  return <div style={{display:"flex",flexDirection:"column",gap:16}}>
+    <div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>navigate("teachers")}/><h1 style={{fontSize:20,fontWeight:800,color:C.text,margin:0}}>{t.name}</h1></div>
+
+    <Card style={{padding:16}}>
+      <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:12}}>
+        <Avatar name={t.name} size={52} color={t.active?C.teal:C.textFaint}/>
+        <div style={{flex:1}}>
+          <p style={{fontSize:16,fontWeight:700,color:C.text,margin:0}}>{t.name}</p>
+          <p style={{fontSize:12,color:C.textMuted,margin:"2px 0 0"}}>{t.subject} • {t.classes.join(", ")}</p>
+        </div>
+        <Pill text={t.active?"Active":"Inactive"} color={t.active?C.success:C.error}/>
+      </div>
+    </Card>
+
+    <div style={{display:"flex",gap:10}}>
+      <div style={{flex:1,padding:14,borderRadius:12,background:C.card,border:`1px solid ${C.border}`,textAlign:"center"}}><p style={{fontSize:22,fontWeight:800,color:t.classAvg>=60?C.success:C.warn,margin:0}}>{t.classAvg}%</p><p style={{fontSize:11,color:C.textMuted,margin:"2px 0 0"}}>Class average</p></div>
+      <div style={{flex:1,padding:14,borderRadius:12,background:C.card,border:`1px solid ${C.border}`,textAlign:"center"}}><p style={{fontSize:22,fontWeight:800,color:t.effectiveness>=70?C.success:C.warn,margin:0}}>{t.effectiveness}%</p><p style={{fontSize:11,color:C.textMuted,margin:"2px 0 0"}}>Effectiveness</p></div>
+    </div>
+
+    <div style={{display:"flex",gap:10}}>
+      <Card style={{flex:1,padding:14,background:C.successSoft,border:`1px solid ${C.success}30`}}>
+        <p style={{fontSize:11,color:C.successDark,margin:"0 0 4px",fontWeight:600}}>Top topic</p>
+        <p style={{fontSize:16,fontWeight:800,color:C.successDark,margin:0}}>{t.topTopic}</p>
+      </Card>
+      <Card style={{flex:1,padding:14,background:C.warnSoft,border:`1px solid ${C.warn}30`}}>
+        <p style={{fontSize:11,color:C.warnDark,margin:"0 0 4px",fontWeight:600}}>Weak topic</p>
+        <p style={{fontSize:16,fontWeight:800,color:C.warnDark,margin:0}}>{t.weakTopic}</p>
+      </Card>
+    </div>
+
+    <Card><p style={{fontSize:14,fontWeight:700,color:C.text,margin:"0 0 12px"}}>Class-by-class breakdown</p>
+      {tClasses.length>0?tClasses.map((cl,i)=>{const mc=cl.mastery>=60?C.success:cl.mastery>=45?C.warn:C.error;return <div key={i} style={{padding:"10px 0",borderTop:i?`1px solid ${C.borderSoft}`:"none"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+          <span style={{fontSize:13,fontWeight:600,color:C.text}}>{cl.name}</span>
+          <span style={{fontSize:12,fontWeight:700,color:mc}}>{cl.mastery}%</span>
+        </div>
+        <Bar value={cl.mastery} color={mc} h={5}/>
+        <p style={{fontSize:11,color:C.textMuted,margin:"4px 0 0"}}>{cl.students} students</p>
+      </div>;}):t.classes.map((cls,i)=> <div key={i} style={{padding:"10px 0",borderTop:i?`1px solid ${C.borderSoft}`:"none"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+          <span style={{fontSize:13,fontWeight:600,color:C.text}}>Class {cls}</span>
+          <span style={{fontSize:12,fontWeight:700,color:C.warn}}>—</span>
+        </div>
+      </div>)}
+    </Card>
+
+    <Card style={{padding:16,display:"flex",alignItems:"center",gap:14}}>
+      <div style={{width:44,height:44,borderRadius:12,background:C.primarySoft,display:"flex",alignItems:"center",justifyContent:"center"}}><I n="users" s={22} c={C.primary}/></div>
+      <div><p style={{fontSize:14,fontWeight:600,color:C.text,margin:0}}>Student engagement</p><p style={{fontSize:12,color:C.textMuted,margin:"2px 0 0"}}>{activeStudents}/{t.students} students active</p></div>
+    </Card>
+  </div>;
+};
+
+/* ============ CLASS DETAIL ============ */
+const ClassDetailScreen=({navigate,classInfo})=> {
+  const cl=classInfo||classData[0];
+  const mc=cl.mastery>=60?C.success:cl.mastery>=45?C.warn:C.error;
+  const top5=[{name:"Riya",mastery:88},{name:"Neha",mastery:71},{name:"Aarav",mastery:62},{name:"Vikram",mastery:52},{name:"Arjun",mastery:45}];
+  const bottom5=[{name:"Priya",mastery:28},{name:"Karan",mastery:32},{name:"Ananya",mastery:35},{name:"Meera",mastery:38},{name:"Rahul",mastery:40}];
+  return <div style={{display:"flex",flexDirection:"column",gap:16}}>
+    <div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>navigate("dashboard")}/><h1 style={{fontSize:20,fontWeight:800,color:C.text,margin:0}}>{cl.name}</h1></div>
+
+    <Card style={{padding:16}}>
+      <p style={{fontSize:16,fontWeight:700,color:C.text,margin:"0 0 4px"}}>{cl.name}</p>
+      <p style={{fontSize:12,color:C.textMuted,margin:"0 0 4px"}}>{cl.teacher}</p>
+      <Pill text={`${cl.students} students`} color={C.primary} icon="users"/>
+    </Card>
+
+    <div style={{display:"flex",alignItems:"center",gap:16}}>
+      <Ring value={cl.mastery} size={80} stroke={6} color={mc}><p style={{fontSize:20,fontWeight:800,color:mc,margin:0}}>{cl.mastery}%</p></Ring>
+      <div style={{flex:1}}>
+        <p style={{fontSize:14,fontWeight:700,color:C.text,margin:"0 0 4px"}}>Class mastery</p>
+        <Pill text="+3% this month" color={C.success} icon="trendUp"/>
+      </div>
+    </div>
+
+    <Card><p style={{fontSize:14,fontWeight:700,color:C.text,margin:"0 0 12px"}}>Top 5 students</p>
+      {top5.map((s,i)=>{const sc=s.mastery>=60?C.success:s.mastery>=45?C.warn:C.error;return <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderTop:i?`1px solid ${C.borderSoft}`:"none"}}>
+        <Avatar name={s.name} size={28} color={sc}/>
+        <span style={{fontSize:13,color:C.text,flex:1}}>{s.name}</span>
+        <span style={{fontSize:13,fontWeight:700,color:sc}}>{s.mastery}%</span>
+      </div>;})}
+    </Card>
+
+    <Card><p style={{fontSize:14,fontWeight:700,color:C.text,margin:"0 0 12px"}}>Bottom 5 students</p>
+      {bottom5.map((s,i)=>{const sc=s.mastery>=60?C.success:s.mastery>=45?C.warn:C.error;return <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderTop:i?`1px solid ${C.borderSoft}`:"none"}}>
+        <Avatar name={s.name} size={28} color={sc}/>
+        <span style={{fontSize:13,color:C.text,flex:1}}>{s.name}</span>
+        <span style={{fontSize:13,fontWeight:700,color:sc}}>{s.mastery}%</span>
+      </div>;})}
+    </Card>
+
+    <Card style={{background:C.primarySoft,border:`1px solid ${C.primary}30`,padding:16}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}><I n="chart" s={18} c={C.primary}/><p style={{fontSize:13,fontWeight:700,color:C.primary,margin:0}}>Recent activity</p></div>
+      <p style={{fontSize:13,color:C.text,margin:0,lineHeight:1.6}}>{cl.active}/{cl.students} students active this week. Average of 3.2 quizzes completed per student. 4 tutor sessions initiated.</p>
+    </Card>
+  </div>;
+};
+
+/* ============ STUDENT DETAIL ============ */
+const StudentDetailScreen=({navigate,student})=> {
+  const s=student||{name:"Student",class:"6-A",mastery:62,lastActive:"2 hrs ago",streak:5};
+  return <div style={{display:"flex",flexDirection:"column",gap:16}}>
+    <div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>navigate("dashboard")}/><h1 style={{fontSize:20,fontWeight:800,color:C.text,margin:0}}>{s.name}</h1></div>
+
+    <Card style={{padding:16}}>
+      <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:12}}>
+        <Avatar name={s.name} size={48} color={C.primary}/>
+        <div>
+          <p style={{fontSize:16,fontWeight:700,color:C.text,margin:0}}>{s.name}</p>
+          <p style={{fontSize:12,color:C.textMuted,margin:"2px 0 0"}}>Class {s.class||"6-A"}</p>
+        </div>
+      </div>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+        <Pill text={`${s.mastery||62}% mastery`} color={(s.mastery||62)>=60?C.success:C.warn} icon="brain"/>
+        <Pill text={`Last active: ${s.lastActive||"2 hrs ago"}`} color={C.textMuted}/>
+        <Pill text={`${s.streak||5} day streak`} color={C.accent} icon="target"/>
+      </div>
+    </Card>
+
+    <Card><p style={{fontSize:14,fontWeight:700,color:C.text,margin:"0 0 12px"}}>Subject mastery</p>
+      {[{subject:"Science",mastery:65,color:C.teal},{subject:"Math",mastery:58,color:C.primary}].map((sub,i)=> <div key={i} style={{marginBottom:i===0?12:0}}>
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+          <span style={{fontSize:13,fontWeight:600,color:C.text}}>{sub.subject}</span>
+          <span style={{fontSize:13,fontWeight:700,color:sub.mastery>=60?C.success:C.warn}}>{sub.mastery}%</span>
+        </div>
+        <Bar value={sub.mastery} color={sub.color} h={6}/>
+      </div>)}
+    </Card>
+
+    <Card><p style={{fontSize:14,fontWeight:700,color:C.text,margin:"0 0 12px"}}>Activity summary</p>
+      <div style={{display:"flex",gap:10}}>
+        <div style={{flex:1,padding:12,borderRadius:10,background:C.borderSoft,textAlign:"center"}}><p style={{fontSize:20,fontWeight:800,color:C.primary,margin:0}}>12</p><p style={{fontSize:10,color:C.textMuted,margin:"2px 0 0"}}>Quizzes taken</p></div>
+        <div style={{flex:1,padding:12,borderRadius:10,background:C.borderSoft,textAlign:"center"}}><p style={{fontSize:20,fontWeight:800,color:C.teal,margin:0}}>5</p><p style={{fontSize:10,color:C.textMuted,margin:"2px 0 0"}}>Tutor sessions</p></div>
+        <div style={{flex:1,padding:12,borderRadius:10,background:C.borderSoft,textAlign:"center"}}><p style={{fontSize:20,fontWeight:800,color:C.accent,margin:0}}>4</p><p style={{fontSize:10,color:C.textMuted,margin:"2px 0 0"}}>Days active</p></div>
+      </div>
+    </Card>
+
+    <Btn variant="soft" full icon="arrowL" onClick={()=>navigate("dashboard")}>Back</Btn>
+  </div>;
+};
+
+/* ============ CALENDAR ============ */
+const CalendarScreen=({navigate})=> {
+  const months=["Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const[selMonth,setSelMonth]=useState("Mar");
+  const dates=[
+    {name:"Term 1 Start",date:"Apr 1",type:"event"},
+    {name:"SA1 Exam",date:"Apr 23",type:"exam"},
+    {name:"Summer Break",date:"May 20 — Jun 30",type:"holiday"},
+    {name:"Term 2 Start",date:"Sep 1",type:"event"},
+    {name:"SA2 Exam",date:"Sep 15",type:"exam"},
+    {name:"Diwali Break",date:"Oct 20–25",type:"holiday"},
+    {name:"Annual Day",date:"Dec 15",type:"event"},
+  ];
+  const typeColor={exam:{color:C.error,bg:C.errorSoft},holiday:{color:C.success,bg:C.successSoft},event:{color:C.primary,bg:C.primarySoft}};
+  return <div style={{display:"flex",flexDirection:"column",gap:16}}>
+    <div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>navigate("settings")}/><h1 style={{fontSize:20,fontWeight:800,color:C.text,margin:0}}>Academic Calendar</h1></div>
+
+    <Card style={{padding:16,textAlign:"center"}}>
+      <p style={{fontSize:18,fontWeight:800,color:C.text,margin:0}}>2025–26 Academic Year</p>
+    </Card>
+
+    <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+      {months.map(m=> <button key={m} onClick={()=>setSelMonth(m)} style={{padding:"6px 14px",borderRadius:999,fontSize:12,fontWeight:600,border:"none",cursor:"pointer",fontFamily:"inherit",background:selMonth===m?C.primary:`${C.primary}12`,color:selMonth===m?"#fff":C.primary}}>{m}</button>)}
+    </div>
+
+    <div><p style={{fontSize:14,fontWeight:700,color:C.text,margin:"0 0 10px"}}>Key dates</p>
+      {dates.map((d,i)=>{const tc=typeColor[d.type];return <Card key={i} style={{marginBottom:8,padding:14,display:"flex",alignItems:"center",gap:14,background:tc.bg,border:`1px solid ${tc.color}30`}}>
+        <div style={{width:40,height:40,borderRadius:12,background:`${tc.color}20`,display:"flex",alignItems:"center",justifyContent:"center"}}><I n="calendar" s={20} c={tc.color}/></div>
+        <div style={{flex:1}}>
+          <p style={{fontSize:14,fontWeight:600,color:C.text,margin:0}}>{d.name}</p>
+          <p style={{fontSize:12,color:tc.color,fontWeight:600,margin:"2px 0 0"}}>{d.date}</p>
+        </div>
+        <Pill text={d.type} color={tc.color}/>
+      </Card>;})}
+    </div>
+
+    <Btn variant="soft" full icon="plus">Add date</Btn>
+  </div>;
+};
+
+/* ============ BILLING ============ */
+const BillingScreen=({navigate})=> {
+  const features=["Unlimited quizzes","AI tutoring for all students","Parent dashboard","Custom branding","Analytics & reports","Priority support"];
+  return <div style={{display:"flex",flexDirection:"column",gap:16}}>
+    <div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>navigate("settings")}/><h1 style={{fontSize:20,fontWeight:800,color:C.text,margin:0}}>Billing</h1></div>
+
+    <Card style={{background:"linear-gradient(135deg, #1E40AF, #7C3AED)",border:"none",padding:20,color:"#fff"}}>
+      <p style={{fontSize:14,fontWeight:600,opacity:0.8,margin:"0 0 4px"}}>Current plan</p>
+      <p style={{fontSize:24,fontWeight:800,margin:"0 0 8px"}}>School Plan — Active</p>
+      <Pill text="Renews Mar 2027" bg="rgba(255,255,255,0.2)" color="#fff" icon="calendar"/>
+    </Card>
+
+    <div style={{display:"flex",gap:10}}>
+      <Card style={{flex:1,padding:14,textAlign:"center"}}><p style={{fontSize:18,fontWeight:800,color:C.primary,margin:0}}>420<span style={{fontSize:12,fontWeight:500,color:C.textMuted}}>/500</span></p><p style={{fontSize:10,color:C.textMuted,margin:"2px 0 0"}}>Students</p></Card>
+      <Card style={{flex:1,padding:14,textAlign:"center"}}><p style={{fontSize:18,fontWeight:800,color:C.teal,margin:0}}>18<span style={{fontSize:12,fontWeight:500,color:C.textMuted}}>/25</span></p><p style={{fontSize:10,color:C.textMuted,margin:"2px 0 0"}}>Teachers</p></Card>
+      <Card style={{flex:1,padding:14,textAlign:"center"}}><p style={{fontSize:18,fontWeight:800,color:C.accent,margin:0}}>2.1<span style={{fontSize:12,fontWeight:500,color:C.textMuted}}>/5 GB</span></p><p style={{fontSize:10,color:C.textMuted,margin:"2px 0 0"}}>Storage</p></Card>
+    </div>
+
+    <Card><p style={{fontSize:14,fontWeight:700,color:C.text,margin:"0 0 12px"}}>Plan features</p>
+      {features.map((f,i)=> <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderTop:i?`1px solid ${C.borderSoft}`:"none"}}>
+        <div style={{width:22,height:22,borderRadius:6,background:C.successSoft,display:"flex",alignItems:"center",justifyContent:"center"}}><I n="check" s={14} c={C.success} w={2.5}/></div>
+        <span style={{fontSize:13,color:C.text}}>{f}</span>
+      </div>)}
+    </Card>
+
+    <div style={{display:"flex",gap:10}}>
+      <Btn variant="primary" full icon="star">Contact sales</Btn>
+      <Btn variant="ghost" full icon="chart">View invoices</Btn>
+    </div>
   </div>;
 };
 
@@ -281,11 +501,11 @@ const SettingsScreen=({navigate})=> {
     <Card style={{padding:0}}>
       {[
         {label:"Branding & appearance",desc:"Logo, colors, school name",icon:"palette",screen:"branding"},
-        {label:"Academic calendar",desc:"Exam dates, holidays, term schedule",icon:"calendar"},
+        {label:"Academic calendar",desc:"Exam dates, holidays, term schedule",icon:"calendar",screen:"calendar"},
         {label:"Board & curriculum",desc:"CBSE • Can be changed",icon:"book"},
         {label:"Data & privacy",desc:"Student data policy, COPPA compliance",icon:"shield"},
         {label:"Notifications",desc:"Who gets what alerts and when",icon:"bell"},
-        {label:"Billing & subscription",desc:"School plan • Active",icon:"star"},
+        {label:"Billing & subscription",desc:"School plan • Active",icon:"star",screen:"billing"},
       ].map((item,i)=> <div key={i} onClick={item.screen?()=>navigate(item.screen):undefined} style={{display:"flex",alignItems:"center",gap:14,padding:"16px 20px",borderTop:i?`1px solid ${C.borderSoft}`:"none",cursor:item.screen?"pointer":"default"}}>
         <div style={{width:36,height:36,borderRadius:10,background:C.primarySoft,display:"flex",alignItems:"center",justifyContent:"center"}}><I n={item.icon} s={18} c={C.primary}/></div>
         <div style={{flex:1}}><p style={{fontSize:14,fontWeight:500,color:C.text,margin:0}}>{item.label}</p><p style={{fontSize:12,color:C.textMuted,margin:"2px 0 0"}}>{item.desc}</p></div>
@@ -300,12 +520,14 @@ export default function OrgApp(){
   const[screen,setScreen]=useState("dashboard");
   const[context,setContext]=useState(null);
   const scrollRef=useRef(null);
+  const navigateRef=useRef(null);
   const navigate=(s,ctx)=>{setScreen(s);if(ctx!==undefined)setContext(ctx);scrollRef.current?.scrollTo(0,0);};
-  useEffect(()=>{const h=(e)=>navigate(e.detail);window.addEventListener('sidebar-nav',h);return()=>window.removeEventListener('sidebar-nav',h);},[]);
+  navigateRef.current=navigate;
+  useEffect(()=>{const h=(e)=>navigateRef.current?.(e.detail);window.addEventListener('sidebar-nav',h);return()=>window.removeEventListener('sidebar-nav',h);},[]);
 
   const navItems=[{id:"dashboard",icon:"home",label:"Dashboard"},{id:"teachers",icon:"users",label:"Teachers"},{id:"curriculum",icon:"book",label:"Curriculum"},{id:"analytics",icon:"chart",label:"Analytics"},{id:"settings",icon:"settings",label:"Settings"}];
-  const screens={dashboard:<DashboardScreen navigate={navigate}/>,teachers:<TeachersScreen navigate={navigate}/>,curriculum:<CurriculumScreen navigate={navigate}/>,branding:<BrandingScreen navigate={navigate}/>,analytics:<AnalyticsScreen navigate={navigate}/>,users:<UsersScreen navigate={navigate}/>,settings:<SettingsScreen navigate={navigate}/>};
-  const activeNav=screen==="branding"?"settings":screen==="users"?"settings":screen;
+  const screens={dashboard:<DashboardScreen navigate={navigate}/>,teachers:<TeachersScreen navigate={navigate}/>,curriculum:<CurriculumScreen navigate={navigate}/>,branding:<BrandingScreen navigate={navigate}/>,analytics:<AnalyticsScreen navigate={navigate}/>,users:<UsersScreen navigate={navigate}/>,settings:<SettingsScreen navigate={navigate}/>,teacherDetail:<TeacherDetailScreen navigate={navigate} teacher={context||teachers[0]}/>,classDetail:<ClassDetailScreen navigate={navigate} classInfo={context||classData[0]}/>,studentDetail:<StudentDetailScreen navigate={navigate} student={context}/>,calendar:<CalendarScreen navigate={navigate}/>,billing:<BillingScreen navigate={navigate}/>};
+  const activeNav=screen==="branding"?"settings":screen==="users"?"settings":screen==="teacherDetail"?"teachers":screen==="classDetail"?"dashboard":screen==="studentDetail"?"dashboard":screen==="calendar"?"settings":screen==="billing"?"settings":screen;
 
   return <div style={{fontFamily:'"Inter",-apple-system,sans-serif',maxWidth:"100%",margin:"0 auto",background:C.bg,minHeight:"100vh",display:"flex",flexDirection:"column",borderRadius:0,overflow:"hidden",boxShadow:"none",position:"relative"}}>
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 18px 10px",background:C.card,borderBottom:`1px solid ${C.border}`}}>

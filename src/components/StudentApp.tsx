@@ -368,8 +368,10 @@ return <div style={{display:"flex",flexDirection:"column",gap:16}}><div style={{
 /* ============ APP SHELL ============ */
 export default function App(){
   const[onboarded,setOnboarded]=useState(false);const[screen,setScreen]=useState("home");const[xp,setXP]=useState(240);const[streak]=useState(3);const scrollRef=useRef(null);
-  const navigate=(s)=>{setScreen(s);scrollRef.current?.scrollTo(0,0);};const addXP=(n)=>setXP(x=>x+n);
-  useEffect(()=>{const h=(e)=>navigate(e.detail);window.addEventListener('sidebar-nav',h);return()=>window.removeEventListener('sidebar-nav',h);},[]);
+  const navigateRef=useRef(null);
+  const navigate=(s)=>{setOnboarded(true);setScreen(s);scrollRef.current?.scrollTo(0,0);};const addXP=(n)=>setXP(x=>x+n);
+  navigateRef.current=navigate;
+  useEffect(()=>{const h=(e)=>navigateRef.current?.(e.detail);window.addEventListener('sidebar-nav',h);return()=>window.removeEventListener('sidebar-nav',h);},[]);
 
   if(!onboarded)return <div style={{fontFamily:'"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',maxWidth:"100%",margin:"0 auto",background:C.bg,minHeight:"100vh",borderRadius:0,overflow:"hidden",boxShadow:"none",position:"relative"}}><OnboardingScreen onComplete={()=>setOnboarded(true)}/></div>;
 

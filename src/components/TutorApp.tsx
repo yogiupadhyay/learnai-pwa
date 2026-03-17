@@ -40,6 +40,13 @@ edit: <svg style={st} viewBox="0 0 24 24"><path {...p} d="M11 4H4a2 2 0 0 0-2 2v
 eye: <svg style={st} viewBox="0 0 24 24"><path {...p} d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle {...p} cx="12" cy="12" r="3"/></svg>,
 activity: <svg style={st} viewBox="0 0 24 24"><path {...p} d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
 filter: <svg style={st} viewBox="0 0 24 24"><path {...p} d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>,
+user: <svg style={st} viewBox="0 0 24 24"><path {...p} d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle {...p} cx="12" cy="7" r="4"/></svg>,
+settings: <svg style={st} viewBox="0 0 24 24"><circle {...p} cx="12" cy="12" r="3"/><path {...p} d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+logout: <svg style={st} viewBox="0 0 24 24"><path {...p} d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path {...p} d="M16 17l5-5-5-5M21 12H9"/></svg>,
+mail: <svg style={st} viewBox="0 0 24 24"><rect {...p} x="2" y="4" width="20" height="16" rx="2"/><path {...p} d="M22 7l-10 7L2 7"/></svg>,
+phone: <svg style={st} viewBox="0 0 24 24"><path {...p} d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
+help: <svg style={st} viewBox="0 0 24 24"><circle {...p} cx="12" cy="12" r="10"/><path {...p} d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path {...p} d="M12 17h.01"/></svg>,
+info: <svg style={st} viewBox="0 0 24 24"><circle {...p} cx="12" cy="12" r="10"/><path {...p} d="M12 16v-4M12 8h.01"/></svg>,
 };return icons[n]||null;};
 
 /* ============ PRIMITIVES ============ */
@@ -433,6 +440,132 @@ return <div style={{display:"flex",flexDirection:"column",gap:16}}>
   <Btn full variant="blue" icon="radio" onClick={()=>setStage("live")} style={{height:52,fontSize:16}}>Broadcast to class</Btn></div>;
 };
 
+/* ============ PROFILE ============ */
+const ProfileScreen=({navigate})=>{
+  const[notifPrefs,setNotifPrefs]=useState({studentAlerts:true,assignmentReminders:true,weeklyDigest:false,systemUpdates:false});
+  const toggle=(key)=>setNotifPrefs(p=>({...p,[key]:!p[key]}));
+  const Toggle=({on,onToggle})=><div onClick={onToggle} style={{width:44,height:24,borderRadius:12,background:on?C.primary:C.border,cursor:"pointer",position:"relative",transition:"background 0.2s"}}><div style={{width:20,height:20,borderRadius:10,background:"#fff",position:"absolute",top:2,left:on?22:2,transition:"left 0.2s",boxShadow:"0 1px 3px rgba(0,0,0,0.15)"}}/></div>;
+  const Field=({label,value,icon})=><div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 0",borderBottom:`1px solid ${C.borderSoft}`}}><div><p style={{fontSize:11,color:C.textMuted,margin:"0 0 2px"}}>{label}</p><p style={{fontSize:14,color:C.text,margin:0,fontWeight:500}}>{value}</p></div><I n={icon||"edit"} s={16} c={C.textFaint}/></div>;
+  return <div style={{display:"flex",flexDirection:"column",gap:16}}>
+    <h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Profile</h1>
+    <Card style={{display:"flex",alignItems:"center",gap:14,padding:18}}>
+      <Avatar name="Sharma" size={56} color={C.primary}/>
+      <div style={{flex:1}}>
+        <p style={{fontSize:17,fontWeight:700,color:C.text,margin:"0 0 2px"}}>Ms. Sharma</p>
+        <p style={{fontSize:13,color:C.textMuted,margin:"0 0 4px"}}>Science + Math</p>
+        <div style={{display:"flex",gap:6}}>{["6-A","6-B","7-A"].map(c=><Pill key={c} text={c} color={C.primary}/>)}</div>
+      </div>
+    </Card>
+    <div style={{display:"flex",gap:10}}>
+      <Stat label="Total students" value="90" icon="students" color={C.blue}/>
+      <Stat label="Avg effectiveness" value="72%" icon="trendUp" color={C.success}/>
+      <Stat label="Quizzes created" value="24" icon="quiz" color={C.primary}/>
+    </div>
+    <Card>
+      <p style={{fontSize:14,fontWeight:700,color:C.text,margin:"0 0 12px",display:"flex",alignItems:"center",gap:8}}><I n="bell" s={16} c={C.primary}/>Notifications</p>
+      {[{key:"studentAlerts",label:"Student alerts"},{key:"assignmentReminders",label:"Assignment reminders"},{key:"weeklyDigest",label:"Weekly digest"},{key:"systemUpdates",label:"System updates"}].map(item=><div key={item.key} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0",borderBottom:`1px solid ${C.borderSoft}`}}><span style={{fontSize:13,color:C.text}}>{item.label}</span><Toggle on={notifPrefs[item.key]} onToggle={()=>toggle(item.key)}/></div>)}
+    </Card>
+    <Card>
+      <p style={{fontSize:14,fontWeight:700,color:C.text,margin:"0 0 8px",display:"flex",alignItems:"center",gap:8}}><I n="user" s={16} c={C.primary}/>Account</p>
+      <Field label="Name" value="Ms. Sharma"/>
+      <Field label="Email" value="sharma@school.edu.in" icon="mail"/>
+      <Field label="Phone" value="+91 98765 43210" icon="phone"/>
+      <Field label="School" value="Delhi Public School, Sector 12"/>
+    </Card>
+    <Card>
+      <p style={{fontSize:14,fontWeight:700,color:C.text,margin:"0 0 8px",display:"flex",alignItems:"center",gap:8}}><I n="settings" s={16} c={C.primary}/>App Preferences</p>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0",borderBottom:`1px solid ${C.borderSoft}`}}><div><p style={{fontSize:13,color:C.text,margin:0}}>Default class on login</p><p style={{fontSize:11,color:C.textMuted,margin:"2px 0 0"}}>Class 6-B</p></div><I n="chevD" s={16} c={C.textFaint}/></div>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0"}}><span style={{fontSize:13,color:C.text}}>Auto-schedule assignments</span><Toggle on={false} onToggle={()=>{}}/></div>
+    </Card>
+    <div style={{display:"flex",flexDirection:"column",gap:2}}>
+      {[{label:"About LearnAI",icon:"info"},{label:"Help & Support",icon:"help"},{label:"Log out",icon:"logout",color:C.error}].map(item=><button key={item.label} style={{display:"flex",alignItems:"center",gap:10,padding:"14px 4px",background:"transparent",border:"none",cursor:"pointer",fontFamily:"inherit",borderBottom:`1px solid ${C.borderSoft}`}}><I n={item.icon} s={18} c={item.color||C.textMuted}/><span style={{fontSize:14,color:item.color||C.text,fontWeight:500}}>{item.label}</span></button>)}
+    </div>
+  </div>;
+};
+
+/* ============ NOTIFICATIONS ============ */
+const NotifsScreen=({navigate})=>{
+  const groups=[
+    {label:"Today",items:[
+      {title:"Arjun Kumar hasn't practiced in 3 days",desc:"Last active 2 days ago — streak lost",time:"2h ago",color:C.warn,icon:"alert",unread:true},
+      {title:"Fractions quiz: 18/28 completed",desc:"Class 6-B — 10 students pending",time:"3h ago",color:C.blue,icon:"quiz",unread:true},
+      {title:"Class 6-B mastery crossed 60%",desc:"Up from 57% last week — steady progress",time:"5h ago",color:C.success,icon:"trendUp",unread:true},
+    ]},
+    {label:"Yesterday",items:[
+      {title:"Priya Gupta scored below 30%",desc:"Fractions quiz — may need foundation repair",time:"1d ago",color:C.warn,icon:"alert",unread:false},
+      {title:"Due tonight: 6 students pending",desc:"Fractions — Unlike Denominators assignment",time:"1d ago",color:C.blue,icon:"clock",unread:false},
+      {title:"New NCERT chapter indexed",desc:"Electricity — 4 topics ready for quizzes",time:"1d ago",color:C.textMuted,icon:"content",unread:false},
+    ]},
+    {label:"This Week",items:[
+      {title:"Weekly report ready",desc:"Class 6-B performance summary for this week",time:"3d ago",color:C.textMuted,icon:"chart",unread:false},
+      {title:"5 students completed Foundation module",desc:"Fractions basics — avg score 68%",time:"4d ago",color:C.success,icon:"check",unread:false},
+    ]},
+  ];
+  return <div style={{display:"flex",flexDirection:"column",gap:16}}>
+    <div style={{display:"flex",alignItems:"center",gap:12}}>
+      <Back onClick={()=>navigate("dashboard")}/>
+      <h1 style={{fontSize:20,fontWeight:800,color:C.text,margin:0,flex:1}}>Notifications</h1>
+      <button style={{background:"transparent",border:"none",cursor:"pointer",fontFamily:"inherit",fontSize:12,fontWeight:600,color:C.primary}}>Mark all read</button>
+    </div>
+    {groups.map((g,gi)=><div key={gi}>
+      <p style={{fontSize:12,fontWeight:700,color:C.textMuted,margin:"0 0 8px",textTransform:"uppercase",letterSpacing:0.5}}>{g.label}</p>
+      {g.items.map((n,ni)=><Card key={ni} style={{marginBottom:8,padding:14,display:"flex",alignItems:"flex-start",gap:12}}>
+        <div style={{width:36,height:36,borderRadius:10,background:`${n.color}15`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I n={n.icon} s={18} c={n.color}/></div>
+        <div style={{flex:1}}>
+          <div style={{display:"flex",alignItems:"center",gap:6}}><p style={{fontSize:13,fontWeight:600,color:C.text,margin:0,flex:1}}>{n.title}</p>{n.unread&&<div style={{width:8,height:8,borderRadius:"50%",background:C.primary,flexShrink:0}}/>}</div>
+          <p style={{fontSize:12,color:C.textMuted,margin:"3px 0 0"}}>{n.desc}</p>
+          <p style={{fontSize:11,color:C.textFaint,margin:"4px 0 0"}}>{n.time}</p>
+        </div>
+      </Card>)}
+    </div>)}
+  </div>;
+};
+
+/* ============ ASSIGNMENTS ============ */
+const AssignmentsScreen=({navigate})=>{
+  const[tab,setTab]=useState("active");
+  const active=[
+    {title:"Fractions — Unlike Denominators",cls:"Class 6-B",due:"Mar 18",done:18,total:28,color:C.blue},
+    {title:"Heat Transfer Quiz",cls:"Class 7-A",due:"Mar 19",done:22,total:30,color:C.primary},
+    {title:"Decimals Practice",cls:"Class 6-A",due:"Mar 20",done:15,total:32,color:C.blue},
+  ];
+  const overdue=[
+    {title:"Convection Review",cls:"Class 6-B",due:"Mar 14",done:12,total:28,color:C.error},
+    {title:"Ratios Word Problems",cls:"Class 7-A",due:"Mar 12",done:8,total:30,color:C.error},
+  ];
+  const completed=[
+    {title:"Temperature Basics",cls:"Class 6-B",avg:"74%",rate:"96%"},
+    {title:"Like Fractions Drill",cls:"Class 6-A",avg:"68%",rate:"88%"},
+    {title:"Conduction Quiz",cls:"Class 7-A",avg:"71%",rate:"93%"},
+    {title:"Number Line Placement",cls:"Class 6-B",avg:"82%",rate:"100%"},
+  ];
+  const tabs=[{id:"active",label:"Active",count:3},{id:"overdue",label:"Overdue",count:2},{id:"completed",label:"Completed",count:8}];
+  return <div style={{display:"flex",flexDirection:"column",gap:16}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Assignments</h1><Btn variant="primary" icon="send" onClick={()=>navigate("push")}>Push new</Btn></div>
+    <div style={{display:"flex",gap:8}}>{tabs.map(t=><button key={t.id} onClick={()=>setTab(t.id)} style={{flex:1,height:38,borderRadius:10,border:`1.5px solid ${tab===t.id?C.primary:C.border}`,background:tab===t.id?C.primarySoft:"transparent",cursor:"pointer",fontFamily:"inherit",fontSize:12,fontWeight:600,color:tab===t.id?C.primary:C.textMuted}}>{t.label} ({t.count})</button>)}</div>
+    {tab==="active"&&active.map((a,i)=><Card key={i} style={{padding:14}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+        <div><p style={{fontSize:14,fontWeight:600,color:C.text,margin:0}}>{a.title}</p><p style={{fontSize:12,color:C.textMuted,margin:"3px 0 0"}}>{a.cls} • Due {a.due}</p></div>
+        <Pill text={`${a.done}/${a.total}`} color={a.color}/>
+      </div>
+      <Bar value={a.done} max={a.total} color={a.color} h={6}/>
+    </Card>)}
+    {tab==="overdue"&&overdue.map((a,i)=><Card key={i} style={{padding:14,background:C.errorSoft,border:`1px solid ${C.error}20`}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+        <div><p style={{fontSize:14,fontWeight:600,color:C.text,margin:0}}>{a.title}</p><p style={{fontSize:12,color:C.error,margin:"3px 0 0"}}>{a.cls} • Was due {a.due}</p></div>
+        <Pill text={`${a.done}/${a.total}`} color={C.error}/>
+      </div>
+      <Bar value={a.done} max={a.total} color={C.error} h={6}/>
+      <div style={{marginTop:10}}><Btn variant="warn" icon="bell">Remind students</Btn></div>
+    </Card>)}
+    {tab==="completed"&&completed.map((a,i)=><Card key={i} style={{padding:14,display:"flex",alignItems:"center",gap:12}}>
+      <div style={{width:36,height:36,borderRadius:10,background:C.successSoft,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I n="check" s={18} c={C.success} w={2.5}/></div>
+      <div style={{flex:1}}><p style={{fontSize:13,fontWeight:600,color:C.text,margin:0}}>{a.title}</p><p style={{fontSize:12,color:C.textMuted,margin:"2px 0 0"}}>{a.cls}</p></div>
+      <div style={{textAlign:"right"}}><p style={{fontSize:13,fontWeight:700,color:C.success,margin:0}}>{a.avg}</p><p style={{fontSize:11,color:C.textMuted,margin:"2px 0 0"}}>{a.rate} done</p></div>
+    </Card>)}
+  </div>;
+};
+
 /* ============ APP SHELL ============ */
 export default function TutorApp(){
   const[setupDone,setSetupDone]=useState(false);
@@ -440,19 +573,21 @@ export default function TutorApp(){
   const[context,setContext]=useState(null);
   const[currentClass,setCurrentClass]=useState(allClasses[0]);
   const scrollRef=useRef(null);
-  const navigate=(s,ctx)=>{setScreen(s);if(ctx!==undefined)setContext(ctx);scrollRef.current?.scrollTo(0,0);};
-  useEffect(()=>{const h=(e)=>navigate(e.detail);window.addEventListener('sidebar-nav',h);return()=>window.removeEventListener('sidebar-nav',h);},[]);
+  const navigateRef=useRef(null);
+  const navigate=(s,ctx)=>{setSetupDone(true);setScreen(s);if(ctx!==undefined)setContext(ctx);scrollRef.current?.scrollTo(0,0);};
+  navigateRef.current=navigate;
+  useEffect(()=>{const h=(e)=>navigateRef.current?.(e.detail);window.addEventListener('sidebar-nav',h);return()=>window.removeEventListener('sidebar-nav',h);},[]);
 
   if(!setupDone) return <div style={{fontFamily:'"Inter",-apple-system,sans-serif',maxWidth:"100%",margin:"0 auto",background:C.bg,minHeight:"100vh",borderRadius:0,overflow:"hidden",boxShadow:"none",position:"relative"}}><SetupWizard onComplete={()=>setSetupDone(true)}/></div>;
 
-  const navItems=[{id:"dashboard",icon:"home",label:"Home"},{id:"students",icon:"students",label:"Students"},{id:"quizzes",icon:"quiz",label:"Quizzes"},{id:"content",icon:"content",label:"Content"},{id:"analytics",icon:"chart",label:"Analytics"}];
-  const screens={dashboard:<DashboardScreen navigate={navigate} currentClass={currentClass}/>,students:<StudentsScreen navigate={navigate}/>,student:<StudentProfile navigate={navigate} student={context||students[0]}/>,quizzes:<QuizLibraryScreen navigate={navigate}/>,push:<PushScreen navigate={navigate} context={context}/>,analytics:<AnalyticsScreen navigate={navigate}/>,content:<ContentScreen navigate={navigate}/>,poll:<PollScreen navigate={navigate}/>,enrollment:<EnrollmentScreen navigate={navigate} currentClass={currentClass}/>};
-  const activeNav=["student","push","poll","enrollment"].includes(screen)?(screen==="poll"||screen==="enrollment"?"dashboard":"students"):screen;
+  const navItems=[{id:"dashboard",icon:"home",label:"Home"},{id:"students",icon:"students",label:"Students"},{id:"quizzes",icon:"quiz",label:"Quizzes"},{id:"content",icon:"content",label:"Content"},{id:"analytics",icon:"chart",label:"Analytics"},{id:"profile",icon:"user",label:"Profile"}];
+  const screens={dashboard:<DashboardScreen navigate={navigate} currentClass={currentClass}/>,students:<StudentsScreen navigate={navigate}/>,student:<StudentProfile navigate={navigate} student={context||students[0]}/>,quizzes:<QuizLibraryScreen navigate={navigate}/>,push:<PushScreen navigate={navigate} context={context}/>,analytics:<AnalyticsScreen navigate={navigate}/>,content:<ContentScreen navigate={navigate}/>,poll:<PollScreen navigate={navigate}/>,enrollment:<EnrollmentScreen navigate={navigate} currentClass={currentClass}/>,profile:<ProfileScreen navigate={navigate}/>,notifs:<NotifsScreen navigate={navigate}/>,assignments:<AssignmentsScreen navigate={navigate}/>};
+  const activeNav=["student","push","poll","enrollment","notifs","assignments"].includes(screen)?(screen==="poll"||screen==="enrollment"||screen==="notifs"||screen==="assignments"?"dashboard":"students"):screen;
 
   return <div style={{fontFamily:'"Inter",-apple-system,sans-serif',maxWidth:"100%",margin:"0 auto",background:C.bg,minHeight:"100vh",display:"flex",flexDirection:"column",borderRadius:0,overflow:"hidden",boxShadow:"none",position:"relative"}}>
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 18px 10px",background:C.card,borderBottom:`1px solid ${C.border}`}}>
       <div style={{display:"flex",alignItems:"center",gap:10}}><div style={{width:34,height:34,borderRadius:10,background:"linear-gradient(135deg, #7C3AED, #5B21B6)",display:"flex",alignItems:"center",justifyContent:"center"}}><I n="brain" s={18} c="#fff" w={2}/></div><ClassSwitcher current={currentClass} onSwitch={setCurrentClass}/></div>
-      <div style={{display:"flex",gap:6,alignItems:"center"}}><button style={{background:"transparent",border:"none",cursor:"pointer",padding:4,position:"relative",display:"flex"}}><I n="bell" s={20} c={C.textMuted}/><div style={{position:"absolute",top:2,right:2,width:7,height:7,borderRadius:"50%",background:C.error,border:"2px solid #fff"}}/></button><Avatar name="Sharma" size={32} color={C.primary}/></div>
+      <div style={{display:"flex",gap:6,alignItems:"center"}}><button onClick={()=>navigate("notifs")} style={{background:"transparent",border:"none",cursor:"pointer",padding:4,position:"relative",display:"flex"}}><I n="bell" s={20} c={C.textMuted}/><div style={{position:"absolute",top:2,right:2,width:7,height:7,borderRadius:"50%",background:C.error,border:"2px solid #fff"}}/></button><Avatar name="Sharma" size={32} color={C.primary}/></div>
     </div>
     <div ref={scrollRef} style={{flex:1,overflowY:"auto",padding:"14px 18px 100px"}}>{screens[screen]||screens.dashboard}</div>
     <div style={{position:"absolute",bottom:0,left:0,right:0,background:"rgba(255,255,255,0.97)",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",borderTop:`1px solid ${C.border}`,display:"flex",justifyContent:"space-around",padding:"6px 0 18px"}}>

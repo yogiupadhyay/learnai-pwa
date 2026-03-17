@@ -24,6 +24,7 @@ calendar:<svg style={st} viewBox="0 0 24 24"><rect {...p} x="3" y="4" width="18"
 shield:<svg style={st} viewBox="0 0 24 24"><path {...p} d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
 user:<svg style={st} viewBox="0 0 24 24"><path {...p} d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle {...p} cx="12" cy="7" r="4"/></svg>,
 download:<svg style={st} viewBox="0 0 24 24"><path {...p} d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path {...p} d="M7 10l5 5 5-5M12 15V3"/></svg>,
+send:<svg style={st} viewBox="0 0 24 24"><path {...p} d="M22 2L11 13"/><path {...p} d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>,
 };return icons[n]||null;};
 
 /* ============ PRIMITIVES ============ */
@@ -35,37 +36,77 @@ const Ring=({value,max=100,size=64,stroke=5,color=C.primary,children})=>{const r
 const Back=({onClick})=> <button onClick={onClick} style={{background:"transparent",border:"none",cursor:"pointer",padding:4,display:"flex",color:C.textMuted}}><I n="arrowL" s={22} c={C.textMuted}/></button>;
 
 /* ============ DATA ============ */
-const child={name:"Aarav",class:"Class 6-B",school:"Delhi Public School",board:"CBSE",mastery:62,growth:24,streak:3,xp:240,level:12,quizzes:18,tutorSessions:12,photoQs:5,lastActive:"4h ago",teacher:"Ms. Sharma"};
-
-const subjects=[
-  {name:"Science",mastery:58,growth:18,topics:[{name:"Temperature",score:78,trend:"up"},{name:"Conduction",score:65,trend:"up"},{name:"Convection",score:42,trend:"flat"},{name:"Light",score:48,trend:"up"}]},
-  {name:"Math",mastery:66,growth:30,topics:[{name:"Like Fractions",score:82,trend:"up"},{name:"Unlike Fractions",score:55,trend:"up"},{name:"Decimals",score:62,trend:"flat"},{name:"Ratios",score:48,trend:"up"}]},
+const children=[
+  {name:"Aarav",class:"Class 6-B",school:"Delhi Public School",board:"CBSE",mastery:62,growth:24,streak:3,xp:240,level:12,quizzes:18,tutorSessions:12,photoQs:5,lastActive:"4h ago",teacher:"Ms. Sharma"},
+  {name:"Ananya",class:"Class 4-A",school:"Delhi Public School",board:"CBSE",mastery:45,growth:12,streak:1,xp:80,level:5,quizzes:6,tutorSessions:4,photoQs:2,lastActive:"1d ago",teacher:"Mrs. Singh"},
 ];
 
-const weeklyDigest={
-  dates:"Mar 10-16, 2026",
-  highlights:["Completed 5 daily missions","Mastery up 4% this week","Used photo homework 3 times","New badge: Quiz Master"],
-  concern:"Convection is still a weak area — teacher has pushed extra practice",
-  teacherNote:"Aarav is showing great improvement in Math. He responds well to visual explanations. I'm keeping an eye on his Science gaps.",
-};
-
-const milestones=[
-  {title:"Quiz Master",desc:"Completed 15 quizzes",date:"Today",icon:"trophy",color:C.warn,new:true},
-  {title:"3-Day Streak",desc:"Practiced 3 days in a row",date:"Yesterday",icon:"fire",color:"#F97316",new:true},
-  {title:"Math Improver",desc:"Fractions mastery up 30%",date:"3 days ago",icon:"trendUp",color:C.success,new:false},
-  {title:"First Photo Q",desc:"Used camera for homework help",date:"1 week ago",icon:"target",color:C.blue,new:false},
-  {title:"Getting Started",desc:"Completed onboarding",date:"2 weeks ago",icon:"check",color:C.primary,new:false},
+const subjectsByChild=[
+  [
+    {name:"Science",mastery:58,growth:18,topics:[{name:"Temperature",score:78,trend:"up"},{name:"Conduction",score:65,trend:"up"},{name:"Convection",score:42,trend:"flat"},{name:"Light",score:48,trend:"up"}]},
+    {name:"Math",mastery:66,growth:30,topics:[{name:"Like Fractions",score:82,trend:"up"},{name:"Unlike Fractions",score:55,trend:"up"},{name:"Decimals",score:62,trend:"flat"},{name:"Ratios",score:48,trend:"up"}]},
+  ],
+  [
+    {name:"Science",mastery:38,growth:8,topics:[{name:"Plants",score:52,trend:"up"},{name:"Animals",score:45,trend:"flat"},{name:"Materials",score:30,trend:"up"},{name:"Water",score:28,trend:"flat"}]},
+    {name:"Math",mastery:42,growth:15,topics:[{name:"Addition",score:65,trend:"up"},{name:"Subtraction",score:55,trend:"up"},{name:"Shapes",score:35,trend:"flat"},{name:"Measurement",score:22,trend:"flat"}]},
+  ],
 ];
 
-const activity=[
-  {date:"Today",items:[{time:"4:30 PM",action:"Daily mission: 6/8 correct",icon:"target",color:C.success},{time:"5:00 PM",action:"Tutor session: Convection (12 min)",icon:"brain",color:C.blue},{time:"5:20 PM",action:"Photo homework: Ratios",icon:"target",color:C.accent}]},
-  {date:"Yesterday",items:[{time:"5:15 PM",action:"Daily mission: 5/8 correct",icon:"target",color:C.warn},{time:"5:45 PM",action:"Fractions quiz: 8/10",icon:"check",color:C.success},{time:"6:00 PM",action:"Revision: Heat chapter",icon:"book",color:C.primary}]},
-  {date:"Monday",items:[{time:"4:00 PM",action:"Daily mission: 7/8 correct",icon:"target",color:C.success},{time:"4:15 PM",action:"Challenge: Weekly contest",icon:"trophy",color:C.warn}]},
+const weeklyDigestByChild=[
+  {
+    dates:"Mar 10-16, 2026",
+    highlights:["Completed 5 daily missions","Mastery up 4% this week","Used photo homework 3 times","New badge: Quiz Master"],
+    concern:"Convection is still a weak area — teacher has pushed extra practice",
+    teacherNote:"Aarav is showing great improvement in Math. He responds well to visual explanations. I'm keeping an eye on his Science gaps.",
+  },
+  {
+    dates:"Mar 10-16, 2026",
+    highlights:["Completed 2 daily missions","Mastery up 2% this week","Started tutor sessions"],
+    concern:"Water and Materials topics need more attention — teacher is assigning focused exercises",
+    teacherNote:"Ananya is making steady progress. She enjoys the visual lessons. We're working on building her confidence in Science.",
+  },
+];
+
+const milestonesByChild=[
+  [
+    {title:"Quiz Master",desc:"Completed 15 quizzes",date:"Today",icon:"trophy",color:C.warn,new:true},
+    {title:"3-Day Streak",desc:"Practiced 3 days in a row",date:"Yesterday",icon:"fire",color:"#F97316",new:true},
+    {title:"Math Improver",desc:"Fractions mastery up 30%",date:"3 days ago",icon:"trendUp",color:C.success,new:false},
+    {title:"First Photo Q",desc:"Used camera for homework help",date:"1 week ago",icon:"target",color:C.blue,new:false},
+    {title:"Getting Started",desc:"Completed onboarding",date:"2 weeks ago",icon:"check",color:C.primary,new:false},
+  ],
+  [
+    {title:"First Quiz",desc:"Completed first quiz",date:"Today",icon:"trophy",color:C.warn,new:true},
+    {title:"Science Explorer",desc:"Finished Plants topic",date:"2 days ago",icon:"brain",color:C.blue,new:true},
+    {title:"Getting Started",desc:"Completed onboarding",date:"1 week ago",icon:"check",color:C.primary,new:false},
+  ],
+];
+
+const activityByChild=[
+  [
+    {date:"Today",items:[{time:"4:30 PM",action:"Daily mission: 6/8 correct",icon:"target",color:C.success},{time:"5:00 PM",action:"Tutor session: Convection (12 min)",icon:"brain",color:C.blue},{time:"5:20 PM",action:"Photo homework: Ratios",icon:"target",color:C.accent}]},
+    {date:"Yesterday",items:[{time:"5:15 PM",action:"Daily mission: 5/8 correct",icon:"target",color:C.warn},{time:"5:45 PM",action:"Fractions quiz: 8/10",icon:"check",color:C.success},{time:"6:00 PM",action:"Revision: Heat chapter",icon:"book",color:C.primary}]},
+    {date:"Monday",items:[{time:"4:00 PM",action:"Daily mission: 7/8 correct",icon:"target",color:C.success},{time:"4:15 PM",action:"Challenge: Weekly contest",icon:"trophy",color:C.warn}]},
+  ],
+  [
+    {date:"Today",items:[{time:"3:30 PM",action:"Daily mission: 4/8 correct",icon:"target",color:C.warn},{time:"4:00 PM",action:"Tutor session: Plants (10 min)",icon:"brain",color:C.blue}]},
+    {date:"Yesterday",items:[{time:"4:00 PM",action:"Addition quiz: 6/10",icon:"check",color:C.warn},{time:"4:30 PM",action:"Revision: Animals chapter",icon:"book",color:C.primary}]},
+  ],
 ];
 
 /* ============ HOME ============ */
-const HomeScreen=({navigate})=> {
+const HomeScreen=({navigate,activeChild,setActiveChild})=> {
+  const child=children[activeChild];
+  const subjects=subjectsByChild[activeChild];
+  const weeklyDigest=weeklyDigestByChild[activeChild];
+  const milestones=milestonesByChild[activeChild];
+
   return <div style={{display:"flex",flexDirection:"column",gap:16}}>
+    {/* Child switcher */}
+    <div style={{display:"flex",gap:8}}>
+      {children.map((ch,i)=> <button key={i} onClick={()=>setActiveChild(i)} style={{display:"inline-flex",alignItems:"center",gap:6,padding:"6px 16px",borderRadius:999,fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",border:"none",transition:"all 0.15s",background:i===activeChild?C.primary:`${C.primary}10`,color:i===activeChild?"#fff":C.primary}}>{ch.name}</button>)}
+    </div>
+
     <div><p style={{fontSize:13,color:C.textMuted,margin:0}}>Your child's progress</p><h1 style={{fontSize:24,fontWeight:800,color:C.text,margin:"2px 0 0"}}>{child.name}</h1><p style={{fontSize:13,color:C.textMuted,margin:"2px 0 0"}}>{child.class} • {child.school} • {child.board}</p></div>
 
     {/* Overview card */}
@@ -105,7 +146,8 @@ const HomeScreen=({navigate})=> {
     {/* Teacher note */}
     <Card style={{background:C.accentSoft,border:`1px solid ${C.accent}30`,padding:16}}>
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}><I n="msg" s={18} c={C.accent}/><p style={{fontSize:13,fontWeight:700,color:C.accent,margin:0}}>Note from {child.teacher}</p></div>
-      <p style={{fontSize:13,color:C.text,margin:0,lineHeight:1.6}}>{weeklyDigest.teacherNote}</p>
+      <p style={{fontSize:13,color:C.text,margin:"0 0 12px",lineHeight:1.6}}>{weeklyDigest.teacherNote}</p>
+      <Btn variant="small" icon="send" onClick={()=>navigate("message")}>Reply to teacher</Btn>
     </Card>
 
     {/* New milestones */}
@@ -151,7 +193,11 @@ const SubjectScreen=({navigate,subject:sub})=> {
 };
 
 /* ============ WEEKLY DIGEST ============ */
-const DigestScreen=({navigate})=> {
+const DigestScreen=({navigate,activeChild})=> {
+  const child=children[activeChild];
+  const subjects=subjectsByChild[activeChild];
+  const weeklyDigest=weeklyDigestByChild[activeChild];
+
   return <div style={{display:"flex",flexDirection:"column",gap:16}}>
     <h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Weekly digest</h1>
     <p style={{fontSize:13,color:C.textMuted,margin:0}}>{weeklyDigest.dates}</p>
@@ -191,7 +237,10 @@ const DigestScreen=({navigate})=> {
 };
 
 /* ============ ACTIVITY LOG ============ */
-const ActivityScreen=({navigate})=> {
+const ActivityScreen=({navigate,activeChild})=> {
+  const child=children[activeChild];
+  const activity=activityByChild[activeChild];
+
   return <div style={{display:"flex",flexDirection:"column",gap:16}}>
     <h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Activity</h1>
     <p style={{fontSize:13,color:C.textMuted,margin:0}}>What {child.name} has been working on</p>
@@ -227,7 +276,10 @@ const ActivityScreen=({navigate})=> {
 };
 
 /* ============ MILESTONES ============ */
-const MilestonesScreen=({navigate})=> {
+const MilestonesScreen=({navigate,activeChild})=> {
+  const child=children[activeChild];
+  const milestones=milestonesByChild[activeChild];
+
   return <div style={{display:"flex",flexDirection:"column",gap:16}}>
     <h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Milestones</h1>
     <p style={{fontSize:13,color:C.textMuted,margin:0}}>{child.name}'s achievements and badges</p>
@@ -250,7 +302,9 @@ const MilestonesScreen=({navigate})=> {
 };
 
 /* ============ SETTINGS ============ */
-const SettingsScreen=({navigate})=> {
+const SettingsScreen=({navigate,activeChild})=> {
+  const child=children[activeChild];
+
   return <div style={{display:"flex",flexDirection:"column",gap:16}}>
     <h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Settings</h1>
 
@@ -276,17 +330,66 @@ const SettingsScreen=({navigate})=> {
   </div>;
 };
 
+/* ============ MESSAGE SCREEN ============ */
+const MessageScreen=({navigate,activeChild})=> {
+  const child=children[activeChild];
+  const subjects=subjectsByChild[activeChild];
+
+  const messages=activeChild===0?[
+    {from:"teacher",text:"Good news! Aarav improved 24% in Math this month. He responds well to visual explanations."},
+    {from:"parent",text:"That's wonderful! Should we focus more on Science at home?"},
+    {from:"teacher",text:"Yes, Convection is his weakest area. I've pushed extra practice exercises. Encourage him to do 10 min daily."},
+    {from:"parent",text:"Will do. Thanks for the update!"},
+  ]:[
+    {from:"teacher",text:"Ananya is settling in well. She's enthusiastic about the Plants topic and asks great questions."},
+    {from:"parent",text:"That's great to hear! How is she doing in Math?"},
+    {from:"teacher",text:"Math needs some work, especially Shapes and Measurement. I've assigned extra visual exercises. 10 minutes of practice at home would help."},
+    {from:"parent",text:"We'll make sure she practices. Thank you!"},
+  ];
+
+  return <div style={{display:"flex",flexDirection:"column",height:"100%",minHeight:"calc(100vh - 140px)"}}>
+    {/* Header */}
+    <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
+      <Back onClick={()=>navigate("home")}/>
+      <div style={{width:40,height:40,borderRadius:12,background:C.accentSoft,display:"flex",alignItems:"center",justifyContent:"center"}}><I n="user" s={20} c={C.accent}/></div>
+      <div style={{flex:1}}>
+        <p style={{fontSize:15,fontWeight:700,color:C.text,margin:0}}>{child.teacher}</p>
+        <p style={{fontSize:12,color:C.textMuted,margin:"2px 0 0"}}>{subjects.map(s=>s.name).join(" • ")} • {child.class}</p>
+      </div>
+    </div>
+
+    {/* Messages */}
+    <div style={{flex:1,display:"flex",flexDirection:"column",gap:12,marginBottom:16}}>
+      {messages.map((m,i)=>{const isTeacher=m.from==="teacher";return <div key={i} style={{display:"flex",justifyContent:isTeacher?"flex-start":"flex-end"}}>
+        <div style={{maxWidth:"80%",padding:"12px 16px",borderRadius:16,...(isTeacher?{borderTopLeftRadius:4,background:C.borderSoft}:{borderTopRightRadius:4,background:C.primary})}}>
+          {isTeacher&&<p style={{fontSize:11,fontWeight:600,color:C.accent,margin:"0 0 4px"}}>{child.teacher}</p>}
+          <p style={{fontSize:13,color:isTeacher?C.text:"#fff",margin:0,lineHeight:1.5}}>{m.text}</p>
+        </div>
+      </div>;})}
+    </div>
+
+    {/* Input bar */}
+    <div style={{display:"flex",gap:10,alignItems:"center",padding:12,background:C.card,borderRadius:14,border:`1px solid ${C.border}`}}>
+      <input type="text" placeholder="Type a message..." style={{flex:1,border:"none",outline:"none",fontSize:14,fontFamily:"inherit",color:C.text,background:"transparent",padding:"4px 0"}}/>
+      <button style={{width:40,height:40,borderRadius:12,background:C.primary,border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I n="send" s={18} c="#fff" w={2}/></button>
+    </div>
+  </div>;
+};
+
 /* ============ APP SHELL ============ */
 export default function ParentApp(){
   const[screen,setScreen]=useState("home");
   const[context,setContext]=useState(null);
+  const[activeChild,setActiveChild]=useState(0);
   const scrollRef=useRef(null);
+  const navigateRef=useRef(null);
   const navigate=(s,ctx)=>{setScreen(s);if(ctx!==undefined)setContext(ctx);scrollRef.current?.scrollTo(0,0);};
-  useEffect(()=>{const h=(e)=>navigate(e.detail);window.addEventListener('sidebar-nav',h);return()=>window.removeEventListener('sidebar-nav',h);},[]);
+  navigateRef.current=navigate;
+  useEffect(()=>{const h=(e)=>navigateRef.current?.(e.detail);window.addEventListener('sidebar-nav',h);return()=>window.removeEventListener('sidebar-nav',h);},[]);
 
   const navItems=[{id:"home",icon:"home",label:"Home"},{id:"digest",icon:"calendar",label:"Digest"},{id:"activity",icon:"chart",label:"Activity"},{id:"milestones",icon:"trophy",label:"Badges"},{id:"settings",icon:"user",label:"Settings"}];
-  const screens={home:<HomeScreen navigate={navigate}/>,subject:<SubjectScreen navigate={navigate} subject={context||subjects[0]}/>,digest:<DigestScreen navigate={navigate}/>,activity:<ActivityScreen navigate={navigate}/>,milestones:<MilestonesScreen navigate={navigate}/>,settings:<SettingsScreen navigate={navigate}/>};
-  const activeNav=screen==="subject"?"home":screen;
+  const screens={home:<HomeScreen navigate={navigate} activeChild={activeChild} setActiveChild={setActiveChild}/>,subject:<SubjectScreen navigate={navigate} subject={context||subjectsByChild[activeChild][0]}/>,digest:<DigestScreen navigate={navigate} activeChild={activeChild}/>,activity:<ActivityScreen navigate={navigate} activeChild={activeChild}/>,milestones:<MilestonesScreen navigate={navigate} activeChild={activeChild}/>,settings:<SettingsScreen navigate={navigate} activeChild={activeChild}/>,message:<MessageScreen navigate={navigate} activeChild={activeChild}/>};
+  const activeNav=screen==="subject"?"home":screen==="message"?"home":screen;
 
   return <div style={{fontFamily:'"Inter",-apple-system,sans-serif',maxWidth:"100%",margin:"0 auto",background:C.bg,minHeight:"100vh",display:"flex",flexDirection:"column",borderRadius:0,overflow:"hidden",boxShadow:"none",position:"relative"}}>
     {/* Top bar */}

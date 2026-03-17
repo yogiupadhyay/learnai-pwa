@@ -47,6 +47,8 @@ const appConfigs = {
       { id: "quizzes", label: "Quizzes", icon: "quiz" },
       { id: "content", label: "Content", icon: "book" },
       { id: "analytics", label: "Analytics", icon: "chart" },
+      { id: "assignments", label: "Assignments", icon: "quiz" },
+      { id: "profile", label: "Profile", icon: "user" },
     ],
   },
   parent: {
