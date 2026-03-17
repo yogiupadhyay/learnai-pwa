@@ -25,10 +25,12 @@ const SidebarIcon = ({ name, size = 20, color = "currentColor" }) => {
   return icons[name] || null;
 };
 
+const BrandLogo = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2C9 2 7 4.5 7 7.5c0 2 1.2 3.8 2.5 5l.5.8h4l.5-.8C15.8 11.3 17 9.5 17 7.5 17 4.5 15 2 12 2z" fill="rgba(255,255,255,0.12)"/><circle cx="12" cy="6.5" r="1" fill="#fff" stroke="none"/><circle cx="9.8" cy="9" r=".7" fill="#fff" stroke="none"/><circle cx="14.2" cy="9" r=".7" fill="#fff" stroke="none"/><line x1="12" y1="6.5" x2="9.8" y2="9" strokeWidth=".7" opacity=".5"/><line x1="12" y1="6.5" x2="14.2" y2="9" strokeWidth=".7" opacity=".5"/><line x1="9" y1="16" x2="15" y2="16"/><line x1="10" y1="18" x2="14" y2="18"/></svg>;
+
 const appConfigs = {
   student: {
     label: "Student", color: "#2563EB",
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>,
+    icon: <BrandLogo/>,
     nav: [
       { id: "home", label: "Home", icon: "home" },
       { id: "journey", label: "Journey", icon: "chart" },
@@ -40,7 +42,7 @@ const appConfigs = {
   },
   tutor: {
     label: "Tutor", color: "#7C3AED",
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a5 5 0 0 0-4.8 3.6A4 4 0 0 0 4 9.5a4 4 0 0 0 .5 6A4.5 4.5 0 0 0 8 20h1"/><path d="M12 2a5 5 0 0 1 4.8 3.6A4 4 0 0 1 20 9.5a4 4 0 0 1-.5 6A4.5 4.5 0 0 1 16 20h-1"/><path d="M12 2v20"/></svg>,
+    icon: <BrandLogo/>,
     nav: [
       { id: "dashboard", label: "Dashboard", icon: "grid" },
       { id: "students", label: "Students", icon: "users" },
@@ -53,7 +55,7 @@ const appConfigs = {
   },
   parent: {
     label: "Parent", color: "#0D9488",
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+    icon: <BrandLogo/>,
     nav: [
       { id: "home", label: "Home", icon: "home" },
       { id: "digest", label: "Digest", icon: "calendar" },
@@ -64,7 +66,7 @@ const appConfigs = {
   },
   admin: {
     label: "Admin", color: "#1E40AF",
-    icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+    icon: <BrandLogo/>,
     nav: [
       { id: "dashboard", label: "Dashboard", icon: "grid" },
       { id: "teachers", label: "Teachers", icon: "users" },
@@ -105,7 +107,7 @@ export default function ResponsiveWrapper({ app, children }) {
         {/* Logo */}
         <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid #E2E8F0" }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${config.color}, ${config.color}CC)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg, #2563EB, #7C3AED)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               {config.icon}
             </div>
             <div>
