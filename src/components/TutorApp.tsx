@@ -47,6 +47,8 @@ mail: <svg style={st} viewBox="0 0 24 24"><rect {...p} x="2" y="4" width="20" he
 phone: <svg style={st} viewBox="0 0 24 24"><path {...p} d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
 help: <svg style={st} viewBox="0 0 24 24"><circle {...p} cx="12" cy="12" r="10"/><path {...p} d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path {...p} d="M12 17h.01"/></svg>,
 info: <svg style={st} viewBox="0 0 24 24"><circle {...p} cx="12" cy="12" r="10"/><path {...p} d="M12 16v-4M12 8h.01"/></svg>,
+sparkle: <svg style={st} viewBox="0 0 24 24"><path {...p} d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8L12 2z"/><path {...p} d="M5 3l1 3.5L2 8l3.5 1L5 12.5 6 9l3.5-1L6 6.5 5 3z" opacity="0.5"/></svg>,
+whatsapp: <svg style={st} viewBox="0 0 24 24"><path {...p} d="M17.47 14.38c-.28-.14-1.64-.81-1.9-.9-.25-.09-.44-.14-.62.14-.18.28-.72.9-.88 1.08-.16.19-.32.21-.6.07-.28-.14-1.17-.43-2.24-1.38-.83-.74-1.39-1.65-1.55-1.93-.16-.28-.02-.43.12-.57.13-.13.28-.33.42-.5.14-.16.19-.28.28-.47.09-.19.05-.35-.02-.5-.07-.14-.62-1.5-.85-2.06-.22-.54-.45-.47-.62-.48h-.53c-.19 0-.49.07-.74.35-.25.28-.97.95-.97 2.31s.99 2.68 1.13 2.87c.14.19 1.95 2.98 4.73 4.18.66.28 1.18.46 1.58.59.66.21 1.27.18 1.74.11.53-.08 1.64-.67 1.87-1.32.23-.65.23-1.2.16-1.32-.07-.12-.25-.19-.53-.33z"/><path {...p} d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.4A10 10 0 1 0 12 2z"/></svg>,
 };return icons[n]||null;};
 
 /* ============ PRIMITIVES ============ */
@@ -119,6 +121,12 @@ const DashboardScreen=({navigate,currentClass})=>{
   const pendingCount=syllabus.filter(s=>s.status==="pending").length;
   const hour=new Date().getHours();
   const timeContext=hour<12?"morning":hour<16?"afternoon":"evening";
+  const[expandedMisc,setExpandedMisc]=useState(null);
+  const misconceptions=[
+    {text:"Fractions = divide numerator by denominator",students:["Arjun","Priya","Karan","Meena","Raj","Sita","Vikram","Neha","Amit","Dev","Riya","Shreya"],topic:"Fractions",severity:43},
+    {text:"Confuses conduction with convection",students:["Arjun","Priya","Karan","Meena","Raj","Sita","Vikram","Neha"],topic:"Heat",severity:29},
+    {text:"Thinks multiplication makes numbers bigger",students:["Priya","Karan","Meena","Raj","Dev"],topic:"Multiplication",severity:18},
+  ];
 
   const contextActions={
     morning:[
@@ -151,11 +159,34 @@ const DashboardScreen=({navigate,currentClass})=>{
       <Bar value={taughtCount} max={syllabus.length} color="rgba(255,255,255,0.5)" h={4}/>
     </Card>
 
+    {/* Prep tomorrow's class */}
+    <Card onClick={()=>navigate("lessonPlan")} style={{cursor:"pointer",background:`linear-gradient(135deg, ${C.primarySoft}, ${C.blueSoft})`,border:`1px solid ${C.primary}25`,padding:18}}>
+      <div style={{display:"flex",alignItems:"center",gap:10}}>
+        <div style={{width:44,height:44,borderRadius:14,background:`${C.primary}18`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I n="sparkle" s={24} c={C.primary}/></div>
+        <div style={{flex:1}}>
+          <p style={{fontSize:15,fontWeight:700,color:C.text,margin:"0 0 3px"}}>Prep tomorrow's class</p>
+          <p style={{fontSize:12,color:C.textMuted,margin:0}}>Next: Convection — Chapter 4</p>
+        </div>
+        <I n="arrowR" s={16} c={C.primary}/>
+      </div>
+      <Btn variant="primary" full icon="sparkle" style={{marginTop:12,height:48,fontSize:15}} onClick={(e)=>{e.stopPropagation();navigate("lessonPlan");}}>Generate lesson plan</Btn>
+    </Card>
+
     <div style={{display:"flex",gap:10}}>
       <Stat label="Class mastery" value="58%" icon="brain" color={C.primary} sub="+3%"/>
       <Stat label="Active today" value="18/28" icon="students" color={C.blue} sub="+4"/>
       <Stat label="Pending" value="3" icon="send" color={C.warn}/>
     </div>
+
+    {/* SA1 Prediction */}
+    <Card style={{padding:14,display:"flex",alignItems:"center",gap:14}}>
+      <div style={{width:40,height:40,borderRadius:12,background:`${C.blue}12`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I n="target" s={20} c={C.blue}/></div>
+      <div style={{flex:1}}>
+        <p style={{fontSize:13,fontWeight:600,color:C.text,margin:"0 0 4px"}}>Class SA1 prediction: <span style={{fontWeight:800,color:C.blue}}>64%</span></p>
+        <Bar value={64} color={C.blue} h={5}/>
+        <p style={{fontSize:11,color:C.error,margin:"4px 0 0",fontWeight:600}}>At-risk students: 5 <span style={{fontWeight:400,color:C.textMuted}}>(below 50% predicted)</span></p>
+      </div>
+    </Card>
 
     {/* Enrollment tracker */}
     <Card style={{background:C.warnSoft,border:`1px solid ${C.warn}30`,padding:14}} onClick={()=>navigate("enrollment")}>
@@ -169,6 +200,27 @@ const DashboardScreen=({navigate,currentClass})=>{
     <Card style={{background:C.primarySoft,border:`1px solid ${C.primary}30`,padding:16}}>
       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}><I n="trendUp" s={18} c={C.primary}/><p style={{fontSize:13,fontWeight:700,color:C.primary,margin:0}}>Your teaching impact</p></div>
       <div style={{display:"flex",gap:12}}>{[{t:"Temperature",b:40,a:78,c:C.success},{t:"Conduction",b:30,a:62,c:C.success},{t:"Convection",b:25,a:38,c:C.warn}].map(t=><div key={t.t} style={{flex:1,textAlign:"center"}}><p style={{fontSize:11,color:C.textMuted,margin:"0 0 4px"}}>{t.t}</p><p style={{fontSize:15,fontWeight:800,color:t.c,margin:0}}>{t.b}%→{t.a}%</p></div>)}</div>
+    </Card>
+
+    {/* Misconception Radar */}
+    <Card style={{padding:18,border:`1px solid ${C.error}25`}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}><div style={{width:32,height:32,borderRadius:10,background:C.errorSoft,display:"flex",alignItems:"center",justifyContent:"center"}}><I n="alert" s={18} c={C.error}/></div><p style={{fontSize:14,fontWeight:700,color:C.error,margin:0}}>Misconception radar</p></div>
+      {misconceptions.map((m,i)=><div key={i} style={{marginBottom:i<misconceptions.length-1?8:0}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,padding:"10px 0",borderTop:i?`1px solid ${C.borderSoft}`:"none"}}>
+          <div style={{width:8,height:8,borderRadius:"50%",background:C.error,flexShrink:0}}/>
+          <span style={{fontSize:12,color:C.text,flex:1,lineHeight:1.4}}>{m.text}</span>
+          <Pill text={`${m.students.length}`} color={C.error}/>
+          <div style={{width:48}}><Bar value={m.severity} max={50} color={C.error} h={4}/></div>
+          <button onClick={()=>setExpandedMisc(expandedMisc===i?null:i)} style={{padding:"4px 10px",borderRadius:8,border:`1.5px solid ${expandedMisc===i?C.error:C.border}`,background:expandedMisc===i?C.errorSoft:"transparent",cursor:"pointer",fontFamily:"inherit",fontSize:11,fontWeight:600,color:expandedMisc===i?C.error:C.textMuted}}>{expandedMisc===i?"Close":"Fix it"}</button>
+        </div>
+        {expandedMisc===i&&<div style={{padding:"10px 0 6px 16px",display:"flex",flexDirection:"column",gap:10}}>
+          <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{m.students.map((name,j)=><div key={j} style={{display:"inline-flex",alignItems:"center",gap:4,padding:"3px 8px",borderRadius:999,background:`${C.error}10`,fontSize:11,color:C.error,fontWeight:500}}><Avatar name={name} size={18} color={C.error}/>{name}</div>)}</div>
+          <div style={{display:"flex",gap:8}}>
+            <Btn variant="small" icon="play" style={{background:`${C.primary}12`,color:C.primary}}>Push visual explainer</Btn>
+            <Btn variant="small" icon="send" style={{background:`${C.blue}12`,color:C.blue}}>Push practice quiz</Btn>
+          </div>
+        </div>}
+      </div>)}
     </Card>
 
     {/* Flagged students */}
@@ -302,6 +354,70 @@ const StudentProfile=({navigate,student:s})=>{
       </div>
       <div style={{display:"flex",gap:8}}><Btn variant="primary" full icon="download">Download PDF</Btn><Btn variant="ghost" full icon="send">Share</Btn></div>
     </Card>}
+
+    {/* Full Report Card */}
+    <Card style={{padding:20,border:`1.5px solid ${C.border}`}}>
+      <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16,paddingBottom:14,borderBottom:`1px solid ${C.borderSoft}`}}>
+        <Avatar name={s.name} size={44} color={s.color}/>
+        <div><p style={{fontSize:16,fontWeight:800,color:C.text,margin:0}}>{s.name}</p><p style={{fontSize:12,color:C.textMuted,margin:"2px 0 0"}}>Class 6-B • Science + Math • March 2026</p></div>
+      </div>
+
+      {/* Mastery ring + subject bars */}
+      <div style={{display:"flex",alignItems:"center",gap:16,marginBottom:16}}>
+        <div style={{position:"relative",width:72,height:72,flexShrink:0}}>
+          <svg width="72" height="72" viewBox="0 0 72 72"><circle cx="36" cy="36" r="30" fill="none" stroke={`${s.color}20`} strokeWidth="8"/><circle cx="36" cy="36" r="30" fill="none" stroke={s.color} strokeWidth="8" strokeLinecap="round" strokeDasharray={`${s.mastery*1.88} 188.5`} transform="rotate(-90 36 36)"/></svg>
+          <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column"}}><span style={{fontSize:18,fontWeight:800,color:s.color}}>{s.mastery}%</span></div>
+        </div>
+        <div style={{flex:1,display:"flex",flexDirection:"column",gap:6}}>
+          {s.skills.map((sk,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:6}}>
+            <span style={{fontSize:11,color:C.textMuted,width:64,flexShrink:0}}>{sk.topic}</span>
+            <div style={{flex:1}}><Bar value={sk.score} color={signalColors[sk.signal]} h={5}/></div>
+            <span style={{fontSize:11,fontWeight:700,color:signalColors[sk.signal],width:28,textAlign:"right"}}>{sk.score}%</span>
+          </div>)}
+        </div>
+      </div>
+
+      {/* Strengths */}
+      <div style={{marginBottom:14}}>
+        <p style={{fontSize:13,fontWeight:700,color:C.success,margin:"0 0 8px",display:"flex",alignItems:"center",gap:6}}><I n="trendUp" s={14} c={C.success}/> Strengths</p>
+        {(s.skills.filter(sk=>sk.score>=60).slice(0,3).length?s.skills.filter(sk=>sk.score>=60).slice(0,3):[{topic:"Consistency",score:50},{topic:"Effort",score:45},{topic:"Participation",score:40}]).map((sk,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+          <div style={{width:6,height:6,borderRadius:"50%",background:C.success}}/>
+          <span style={{fontSize:12,color:C.text,flex:1}}>{sk.topic||"General"}</span>
+          <div style={{width:60}}><Bar value={sk.score||50} color={C.success} h={4}/></div>
+        </div>)}
+      </div>
+
+      {/* Areas of concern */}
+      <div style={{marginBottom:14}}>
+        <p style={{fontSize:13,fontWeight:700,color:C.error,margin:"0 0 8px",display:"flex",alignItems:"center",gap:6}}><I n="alert" s={14} c={C.error}/> Areas of concern</p>
+        {(s.skills.filter(sk=>sk.score<50).slice(0,2).length?s.skills.filter(sk=>sk.score<50).slice(0,2):[{topic:"Needs more practice",score:35}]).map((sk,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+          <div style={{width:6,height:6,borderRadius:"50%",background:C.error}}/>
+          <span style={{fontSize:12,color:C.text,flex:1}}>{sk.topic}</span>
+          <div style={{width:60}}><Bar value={sk.score} color={C.error} h={4}/></div>
+        </div>)}
+      </div>
+
+      {/* Recommended home practice */}
+      <div style={{marginBottom:14,padding:12,borderRadius:10,background:C.blueSoft}}>
+        <p style={{fontSize:13,fontWeight:700,color:C.blue,margin:"0 0 6px",display:"flex",alignItems:"center",gap:6}}><I n="content" s={14} c={C.blue}/> Recommended home practice</p>
+        <ul style={{margin:0,paddingLeft:18,fontSize:12,color:C.text,lineHeight:1.8}}>
+          {s.weak.length>0?s.weak.map((w,i)=><li key={i}>Practice {w} — 15 min daily with visual aids</li>):<li>Continue current pace with challenging problems</li>}
+          <li>Review class notes before each session</li>
+        </ul>
+      </div>
+
+      {/* Teacher's note */}
+      <div style={{marginBottom:14}}>
+        <p style={{fontSize:13,fontWeight:700,color:C.text,margin:"0 0 8px",display:"flex",alignItems:"center",gap:6}}><I n="edit" s={14} c={C.primary}/> Teacher's note</p>
+        <textarea value={noteText} onChange={e=>setNoteText(e.target.value)} placeholder="Add a personal note for the parent report..." style={{width:"100%",minHeight:60,padding:"10px 14px",borderRadius:12,border:`1.5px solid ${C.border}`,fontFamily:"inherit",fontSize:13,resize:"vertical",boxSizing:"border-box",outline:"none",lineHeight:1.6}}/>
+      </div>
+
+      {/* AI-generated opening */}
+      <div style={{padding:12,borderRadius:10,background:C.primarySoft,marginBottom:4}}>
+        <p style={{fontSize:11,fontWeight:600,color:C.primary,margin:"0 0 4px"}}>AI-generated opening line</p>
+        <p style={{fontSize:13,color:C.text,margin:0,lineHeight:1.5,fontStyle:"italic"}}>{s.mastery>=70?`${s.name.split(" ")[0]} is doing excellent work and shows strong commitment to learning. Keep encouraging this momentum at home!`:s.mastery>=50?`${s.name.split(" ")[0]} is making steady progress and showing improvement. With consistent practice at home, they can reach the next level.`:`${s.name.split(" ")[0]} has potential and is working through some foundational challenges. Your support at home will make a big difference in building confidence.`}</p>
+      </div>
+    </Card>
   </div>;
 };
 
@@ -377,10 +493,31 @@ const PushScreen=({navigate,context})=>{
 /* ============ STUDENTS ============ */
 const StudentsScreen=({navigate})=>{
   const[view,setView]=useState("list");const[filter,setFilter]=useState("all");
+  const[ptmMode,setPtmMode]=useState(false);const[ptmSelected,setPtmSelected]=useState([]);const[ptmDone,setPtmDone]=useState(false);const[ptmGenerating,setPtmGenerating]=useState(false);
   const filtered=filter==="all"?students:students.filter(s=>s.group===filter);
   const groups=[{name:"Toppers",count:2,color:C.success},{name:"Average",count:2,color:C.blue},{name:"Foundation",count:2,color:C.error}];
+  const handlePtmGenerate=()=>{setPtmGenerating(true);setTimeout(()=>{setPtmGenerating(false);setPtmDone(true);},2000);};
   return <div style={{display:"flex",flexDirection:"column",gap:16}}>
-    <h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Students</h1>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Students</h1><Btn variant={ptmMode?"ghost":"soft"} icon={ptmMode?"arrowL":"file"} onClick={()=>{setPtmMode(!ptmMode);setPtmDone(false);setPtmSelected([]);setPtmGenerating(false);}}>{ptmMode?"Cancel":"Generate PTM reports"}</Btn></div>
+    {ptmMode&&<Card style={{padding:16,border:`2px solid ${C.primary}`,background:C.primarySoft}}>
+      <p style={{fontSize:14,fontWeight:700,color:C.primary,margin:"0 0 10px"}}>Select students for PTM reports</p>
+      <div style={{display:"flex",gap:6,marginBottom:10}}><button onClick={()=>setPtmSelected(ptmSelected.length===students.length?[]:students.map(s=>s.name))} style={{padding:"4px 12px",borderRadius:999,border:`1.5px solid ${C.primary}`,background:ptmSelected.length===students.length?C.primary:"transparent",cursor:"pointer",fontFamily:"inherit",fontSize:11,fontWeight:600,color:ptmSelected.length===students.length?"#fff":C.primary}}>{ptmSelected.length===students.length?"Deselect all":"Select all"}</button></div>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:12}}>
+        {students.map((s,i)=><button key={i} onClick={()=>setPtmSelected(ptmSelected.includes(s.name)?ptmSelected.filter(n=>n!==s.name):[...ptmSelected,s.name])} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 12px",borderRadius:10,border:`1.5px solid ${ptmSelected.includes(s.name)?C.primary:C.border}`,background:ptmSelected.includes(s.name)?`${C.primary}08`:"transparent",cursor:"pointer",fontFamily:"inherit"}}>
+          <div style={{width:20,height:20,borderRadius:6,border:`2px solid ${ptmSelected.includes(s.name)?C.primary:C.border}`,display:"flex",alignItems:"center",justifyContent:"center",background:ptmSelected.includes(s.name)?C.primary:"transparent"}}>{ptmSelected.includes(s.name)&&<I n="check" s={12} c="#fff" w={2.5}/>}</div>
+          <Avatar name={s.name} size={28} color={s.color}/><span style={{fontSize:13,fontWeight:500,color:C.text}}>{s.name}</span><span style={{fontSize:11,color:C.textMuted,marginLeft:"auto"}}>{s.mastery}%</span>
+        </button>)}
+      </div>
+      {ptmGenerating&&<div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10,padding:16}}>
+        <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
+        <div style={{width:20,height:20,border:`3px solid ${C.border}`,borderTopColor:C.primary,borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/>
+        <span style={{fontSize:13,color:C.primary,fontWeight:600}}>Generating reports...</span>
+      </div>}
+      {ptmDone?<div style={{display:"flex",flexDirection:"column",gap:10}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,padding:12,borderRadius:10,background:C.successSoft}}><I n="check" s={18} c={C.success}/><span style={{fontSize:13,fontWeight:600,color:C.successDark}}>Reports ready for {ptmSelected.length} students</span></div>
+        <div style={{display:"flex",gap:8}}><Btn variant="primary" style={{flex:1}} icon="download">Download all</Btn><Btn variant="success" style={{flex:1}} icon="whatsapp">Share via WhatsApp</Btn></div>
+      </div>:!ptmGenerating&&<Btn variant="primary" full icon="sparkle" onClick={handlePtmGenerate} style={{opacity:ptmSelected.length?1:0.5}}>Generate reports for {ptmSelected.length} student{ptmSelected.length!==1?"s":""}</Btn>}
+    </Card>}
     <Card style={{background:C.warnSoft,border:`1px solid ${C.warn}30`,padding:12,display:"flex",alignItems:"center",justifyContent:"space-between"}} onClick={()=>navigate("enrollment")}><div style={{display:"flex",alignItems:"center",gap:8}}><I n="userPlus" s={16} c={C.warnDark}/><span style={{fontSize:12,fontWeight:600,color:C.warnDark}}>{notEnrolled.length} haven't joined</span></div><Btn variant="small" icon="send" style={{height:28,fontSize:11}}>Invite</Btn></Card>
     <div style={{display:"flex",background:C.borderSoft,borderRadius:10,padding:3}}>{["list","groups"].map(v=><button key={v} onClick={()=>setView(v)} style={{flex:1,height:34,borderRadius:8,border:"none",cursor:"pointer",fontFamily:"inherit",fontSize:13,fontWeight:600,background:view===v?C.card:"transparent",color:view===v?C.primary:C.textMuted,textTransform:"capitalize",boxShadow:view===v?"0 1px 3px rgba(0,0,0,0.08)":"none"}}>{v}</button>)}</div>
     {view==="groups"&&groups.map((g,i)=><Card key={i} style={{padding:16}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:10,height:10,borderRadius:"50%",background:g.color}}/><span style={{fontSize:14,fontWeight:700,color:C.text}}>{g.name}</span><Pill text={`${g.count}`} color={g.color}/></div><Btn variant="small" icon="send">Push</Btn></div><div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{students.filter(s=>s.group===g.name.toLowerCase()).map(s=><button key={s.name} onClick={()=>navigate("student",s)} style={{padding:"4px 10px",borderRadius:999,border:`1px solid ${C.border}`,background:"transparent",cursor:"pointer",fontFamily:"inherit",fontSize:11,color:C.text}}>{s.name.split(" ")[0]}</button>)}</div></Card>)}
@@ -566,6 +703,93 @@ const AssignmentsScreen=({navigate})=>{
   </div>;
 };
 
+/* ============ LESSON PLAN ============ */
+const LessonPlanScreen=({navigate})=>{
+  const warmupQs=[
+    {q:"What happens when you heat water in a pot?",a:"Warm water rises, cool water sinks — convection current"},
+    {q:"Is convection possible in solids?",a:"No — convection requires fluid (liquid or gas)"},
+    {q:"Name one real-life example of convection.",a:"Sea breeze, boiling water, room heater"},
+  ];
+  const misconceptions=[
+    {text:"Confuses conduction with convection",count:8},
+    {text:"Thinks convection happens in solids",count:5},
+    {text:"Believes hot air sinks",count:3},
+  ];
+  const pollOptions=["Hot air rises because it's lighter","Hot air rises because it expands","Hot air rises because of gravity","Hot air rises because of pressure"];
+  const hwLevels=[
+    {level:"Strong",color:C.success,desc:"5 application problems + 1 beyond-syllabus challenge"},
+    {level:"Average",color:C.blue,desc:"5 conceptual questions + 2 visual-based problems"},
+    {level:"Foundation",color:C.warn,desc:"3 basic recall + 2 guided practice with hints enabled"},
+  ];
+
+  return <div style={{display:"flex",flexDirection:"column",gap:16}}>
+    <div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>navigate("dashboard")}/><h1 style={{fontSize:20,fontWeight:800,color:C.text,margin:0}}>Lesson plan: Convection</h1></div>
+
+    {/* 1. Warm-up quiz */}
+    <Card style={{background:C.blueSoft,border:`1px solid ${C.blue}30`,padding:18}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}><I n="zap" s={18} c={C.blue}/><p style={{fontSize:14,fontWeight:700,color:C.blue,margin:0}}>Warm-up quiz</p><Pill text="5-min opener" color={C.blue}/></div>
+      {warmupQs.map((wq,i)=><div key={i} style={{padding:"10px 0",borderTop:i?`1px solid ${C.blue}20`:"none"}}>
+        <p style={{fontSize:13,fontWeight:600,color:C.text,margin:"0 0 4px"}}>{i+1}. {wq.q}</p>
+        <p style={{fontSize:12,color:C.textMuted,margin:0}}>{wq.a}</p>
+      </div>)}
+      <Btn variant="blue" full icon="send" style={{marginTop:8}}>Push to class</Btn>
+    </Card>
+
+    {/* 2. Watch out for */}
+    <Card style={{background:C.warnSoft,border:`1px solid ${C.warn}30`,padding:18}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}><I n="alert" s={18} c={C.warnDark}/><p style={{fontSize:14,fontWeight:700,color:C.warnDark,margin:0}}>Watch out for</p><Pill text="Common misconceptions" color={C.warn}/></div>
+      {misconceptions.map((m,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderTop:i?`1px solid ${C.warn}25`:"none"}}>
+        <div style={{width:8,height:8,borderRadius:"50%",background:C.warn,flexShrink:0}}/>
+        <span style={{fontSize:13,color:C.text,flex:1}}>{m.text}</span>
+        <Pill text={`${m.count} students`} color={C.warnDark}/>
+      </div>)}
+    </Card>
+
+    {/* 3. Visual explainer */}
+    <Card style={{background:`${C.primary}08`,border:`1px solid ${C.primary}25`,padding:18}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}><I n="play" s={18} c={C.primary}/><p style={{fontSize:14,fontWeight:700,color:C.primary,margin:0}}>Visual explainer</p><Pill text="Project this during class" color={C.primary}/></div>
+      <div style={{width:"100%",height:120,borderRadius:12,background:`linear-gradient(135deg, ${C.primarySoft}, ${C.blueSoft})`,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:12}}>
+        <div style={{width:48,height:48,borderRadius:"50%",background:`${C.primary}20`,display:"flex",alignItems:"center",justifyContent:"center"}}><I n="play" s={24} c={C.primary}/></div>
+      </div>
+      <div style={{display:"flex",gap:8}}>
+        <Btn variant="primary" style={{flex:1}} icon="eye">Open full screen</Btn>
+        <Btn variant="soft" style={{flex:1}} icon="send">Share to students</Btn>
+      </div>
+    </Card>
+
+    {/* 4. Mid-lesson check */}
+    <Card style={{background:`${C.success}06`,border:`1px solid ${C.success}25`,padding:18}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}><I n="radio" s={18} c="#0D9488"/><p style={{fontSize:14,fontWeight:700,color:"#0D9488",margin:0}}>Mid-lesson check</p><Pill text="Live poll" color="#0D9488"/></div>
+      <p style={{fontSize:14,fontWeight:600,color:C.text,margin:"0 0 12px"}}>Why does hot air rise?</p>
+      {pollOptions.map((opt,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 12px",borderRadius:10,border:`1px solid ${C.border}`,marginBottom:6,background:i===1?`${"#0D9488"}12`:"transparent"}}>
+        <span style={{fontSize:13,fontWeight:600,color:i===1?"#0D9488":C.textMuted,width:20}}>{String.fromCharCode(65+i)}.</span>
+        <span style={{fontSize:13,color:i===1?"#0D9488":C.text}}>{opt}</span>
+        {i===1&&<I n="check" s={14} c="#0D9488" w={2.5}/>}
+      </div>)}
+      <Btn variant="success" full icon="radio" onClick={()=>navigate("poll")} style={{marginTop:8}}>Start poll now</Btn>
+    </Card>
+
+    {/* 5. Homework */}
+    <Card style={{background:C.successSoft,border:`1px solid ${C.success}30`,padding:18}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}><I n="send" s={18} c={C.successDark}/><p style={{fontSize:14,fontWeight:700,color:C.successDark,margin:0}}>Homework</p><Pill text="Auto-differentiated" color={C.success}/></div>
+      {hwLevels.map((hw,i)=><div key={i} style={{padding:"10px 0",borderTop:i?`1px solid ${C.success}25`:"none"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+          <div style={{width:10,height:10,borderRadius:"50%",background:hw.color}}/>
+          <span style={{fontSize:13,fontWeight:700,color:hw.color}}>{hw.level}</span>
+        </div>
+        <p style={{fontSize:12,color:C.textMuted,margin:0,paddingLeft:18}}>{hw.desc}</p>
+      </div>)}
+      <Btn variant="success" full icon="send" onClick={()=>navigate("push")} style={{marginTop:8}}>Push homework</Btn>
+    </Card>
+
+    {/* Bottom actions */}
+    <div style={{display:"flex",gap:10}}>
+      <Btn variant="primary" style={{flex:1}} icon="bookmark">Save lesson plan</Btn>
+      <Btn variant="ghost" style={{flex:1}} icon="send">Share with colleague</Btn>
+    </div>
+  </div>;
+};
+
 /* ============ APP SHELL ============ */
 export default function TutorApp(){
   const[setupDone,setSetupDone]=useState(false);
@@ -581,8 +805,8 @@ export default function TutorApp(){
   if(!setupDone) return <div style={{fontFamily:'"Inter",-apple-system,sans-serif',maxWidth:"100%",margin:"0 auto",background:C.bg,minHeight:"100vh",borderRadius:0,overflow:"hidden",boxShadow:"none",position:"relative"}}><SetupWizard onComplete={()=>setSetupDone(true)}/></div>;
 
   const navItems=[{id:"dashboard",icon:"home",label:"Home"},{id:"students",icon:"students",label:"Students"},{id:"quizzes",icon:"quiz",label:"Quizzes"},{id:"content",icon:"content",label:"Content"},{id:"analytics",icon:"chart",label:"Analytics"},{id:"profile",icon:"user",label:"Profile"}];
-  const screens={dashboard:<DashboardScreen navigate={navigate} currentClass={currentClass}/>,students:<StudentsScreen navigate={navigate}/>,student:<StudentProfile navigate={navigate} student={context||students[0]}/>,quizzes:<QuizLibraryScreen navigate={navigate}/>,push:<PushScreen navigate={navigate} context={context}/>,analytics:<AnalyticsScreen navigate={navigate}/>,content:<ContentScreen navigate={navigate}/>,poll:<PollScreen navigate={navigate}/>,enrollment:<EnrollmentScreen navigate={navigate} currentClass={currentClass}/>,profile:<ProfileScreen navigate={navigate}/>,notifs:<NotifsScreen navigate={navigate}/>,assignments:<AssignmentsScreen navigate={navigate}/>};
-  const activeNav=["student","push","poll","enrollment","notifs","assignments"].includes(screen)?(screen==="poll"||screen==="enrollment"||screen==="notifs"||screen==="assignments"?"dashboard":"students"):screen;
+  const screens={dashboard:<DashboardScreen navigate={navigate} currentClass={currentClass}/>,students:<StudentsScreen navigate={navigate}/>,student:<StudentProfile navigate={navigate} student={context||students[0]}/>,quizzes:<QuizLibraryScreen navigate={navigate}/>,push:<PushScreen navigate={navigate} context={context}/>,analytics:<AnalyticsScreen navigate={navigate}/>,content:<ContentScreen navigate={navigate}/>,poll:<PollScreen navigate={navigate}/>,enrollment:<EnrollmentScreen navigate={navigate} currentClass={currentClass}/>,profile:<ProfileScreen navigate={navigate}/>,notifs:<NotifsScreen navigate={navigate}/>,assignments:<AssignmentsScreen navigate={navigate}/>,lessonPlan:<LessonPlanScreen navigate={navigate}/>};
+  const activeNav=["student","push","poll","enrollment","notifs","assignments","lessonPlan"].includes(screen)?(screen==="poll"||screen==="enrollment"||screen==="notifs"||screen==="assignments"||screen==="lessonPlan"?"dashboard":"students"):screen;
 
   return <div style={{fontFamily:'"Inter",-apple-system,sans-serif',maxWidth:"100%",margin:"0 auto",background:C.bg,minHeight:"100vh",display:"flex",flexDirection:"column",borderRadius:0,overflow:"hidden",boxShadow:"none",position:"relative"}}>
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 18px 10px",background:C.card,borderBottom:`1px solid ${C.border}`}}>

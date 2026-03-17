@@ -33,7 +33,7 @@ const appConfigs = {
       { id: "home", label: "Home", icon: "home" },
       { id: "journey", label: "Journey", icon: "chart" },
       { id: "exam", label: "Exams", icon: "quiz" },
-      { id: "revision", label: "Revision", icon: "calendar" },
+      { id: "stories", label: "Feed", icon: "grid" },
       { id: "challenge", label: "Challenge", icon: "trophy" },
       { id: "profile", label: "Profile", icon: "user" },
     ],

@@ -82,6 +82,36 @@ const milestonesByChild=[
   ],
 ];
 
+const screenTimeByChild=[
+  { today: { active: 30, passive: 12, idle: 5 },
+    week: [
+      { day: "M", active: 25, passive: 10, idle: 3 },
+      { day: "T", active: 35, passive: 8, idle: 5 },
+      { day: "W", active: 30, passive: 12, idle: 5 },
+      { day: "T", active: 20, passive: 5, idle: 2 },
+      { day: "F", active: 0, passive: 0, idle: 0 },
+      { day: "S", active: 0, passive: 0, idle: 0 },
+      { day: "S", active: 0, passive: 0, idle: 0 },
+    ]
+  },
+  { today: { active: 18, passive: 8, idle: 3 },
+    week: [
+      { day: "M", active: 15, passive: 6, idle: 2 },
+      { day: "T", active: 20, passive: 10, idle: 4 },
+      { day: "W", active: 18, passive: 8, idle: 3 },
+      { day: "T", active: 12, passive: 4, idle: 1 },
+      { day: "F", active: 0, passive: 0, idle: 0 },
+      { day: "S", active: 0, passive: 0, idle: 0 },
+      { day: "S", active: 0, passive: 0, idle: 0 },
+    ]
+  }
+];
+
+const examPredictorByChild=[
+  { base:[72,78], perDay:3, subjects:[{name:"Science",range:[68,74]},{name:"Math",range:[76,82]}] },
+  { base:[55,61], perDay:3, subjects:[{name:"Science",range:[50,56]},{name:"Math",range:[60,66]}] },
+];
+
 const activityByChild=[
   [
     {date:"Today",items:[{time:"4:30 PM",action:"Daily mission: 6/8 correct",icon:"target",color:C.success},{time:"5:00 PM",action:"Tutor session: Convection (12 min)",icon:"brain",color:C.blue},{time:"5:20 PM",action:"Photo homework: Ratios",icon:"target",color:C.accent}]},
@@ -100,6 +130,9 @@ const HomeScreen=({navigate,activeChild,setActiveChild})=> {
   const subjects=subjectsByChild[activeChild];
   const weeklyDigest=weeklyDigestByChild[activeChild];
   const milestones=milestonesByChild[activeChild];
+  const screenTime=screenTimeByChild[activeChild];
+  const examPredictor=examPredictorByChild[activeChild];
+  const [extraDays,setExtraDays]=useState(0);
 
   return <div style={{display:"flex",flexDirection:"column",gap:16}}>
     {/* Child switcher */}
@@ -142,6 +175,44 @@ const HomeScreen=({navigate,activeChild,setActiveChild})=> {
         <Bar value={sub.mastery} color={sub.mastery>=60?C.success:sub.mastery>=40?C.warn:C.error} h={5}/>
       </Card>)}
     </div>
+
+    {/* Screen time card */}
+    {(()=>{const t=screenTime.today;const total=t.active+t.passive+t.idle;return <Card style={{padding:16}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}><I n="clock" s={18} c={C.textMuted}/><p style={{fontSize:14,fontWeight:700,color:C.text,margin:0}}>Today's screen time</p></div>
+      <p style={{fontSize:28,fontWeight:800,color:C.text,margin:"0 0 12px"}}>{total} minutes</p>
+      <div style={{display:"flex",height:10,borderRadius:5,overflow:"hidden",marginBottom:10}}>
+        <div style={{width:`${(t.active/total)*100}%`,background:C.success,transition:"width 0.3s"}}/>
+        <div style={{width:`${(t.passive/total)*100}%`,background:C.blue,transition:"width 0.3s"}}/>
+        <div style={{width:`${(t.idle/total)*100}%`,background:C.textFaint,transition:"width 0.3s"}}/>
+      </div>
+      <div style={{display:"flex",gap:16,marginBottom:10}}>
+        {[{label:"Active learning",min:t.active,color:C.success},{label:"Passive learning",min:t.passive,color:C.blue},{label:"Idle",min:t.idle,color:C.textFaint}].map(c=> <div key={c.label} style={{display:"flex",alignItems:"center",gap:5}}>
+          <div style={{width:8,height:8,borderRadius:"50%",background:c.color}}/>
+          <span style={{fontSize:11,color:C.textMuted}}>{c.label}: {c.min}m</span>
+        </div>)}
+      </div>
+      <p style={{fontSize:12,color:C.success,fontWeight:600,margin:0}}>{"\u2191"} 12% more active learning than last week</p>
+    </Card>;})()}
+
+    {/* Exam predictor card */}
+    {(()=>{const pred=examPredictor;const low=pred.base[0]+extraDays*pred.perDay;const high=pred.base[1]+extraDays*pred.perDay;const boost=extraDays*pred.perDay;return <Card style={{padding:16,background:C.blueSoft,border:`1px solid ${C.blue}25`}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}><I n="target" s={18} c={C.blue}/><p style={{fontSize:14,fontWeight:700,color:C.blue,margin:0}}>SA1 prediction</p></div>
+      <p style={{fontSize:28,fontWeight:800,color:C.text,margin:"0 0 4px"}}>{low} — {high}%</p>
+      <p style={{fontSize:12,color:C.textMuted,margin:"0 0 14px"}}>Based on current practice pace</p>
+      <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:14}}>
+        {pred.subjects.map(s=>{const sLow=s.range[0]+extraDays*pred.perDay;const sHigh=s.range[1]+extraDays*pred.perDay;const pct=(sLow+sHigh)/2;return <div key={s.name}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:12,fontWeight:600,color:C.text}}>{s.name}</span><span style={{fontSize:12,fontWeight:700,color:pct>=70?C.success:pct>=50?C.warn:C.error}}>{sLow}-{sHigh}%</span></div>
+          <Bar value={pct} color={pct>=70?C.success:pct>=50?C.warn:C.error} h={5}/>
+        </div>;})}
+      </div>
+      <div style={{padding:14,background:"rgba(255,255,255,0.7)",borderRadius:12}}>
+        <p style={{fontSize:13,fontWeight:600,color:C.text,margin:"0 0 8px"}}>What if {child.name} does more practice?</p>
+        <label style={{fontSize:12,color:C.textMuted,display:"block",marginBottom:6}}>Extra practice days per week: <strong style={{color:C.text}}>{extraDays}</strong></label>
+        <input type="range" min={0} max={4} step={1} value={extraDays} onChange={e=>setExtraDays(Number(e.target.value))} style={{width:"100%",accentColor:C.blue,height:6,cursor:"pointer"}}/>
+        <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:C.textFaint,marginTop:2}}><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span></div>
+        {extraDays>0&&<p style={{fontSize:12,fontWeight:600,color:C.success,margin:"10px 0 0"}}>Just {extraDays} more practice day{extraDays>1?"s":""} could boost the score by {boost}%!</p>}
+      </div>
+    </Card>;})()}
 
     {/* Teacher note */}
     <Card style={{background:C.accentSoft,border:`1px solid ${C.accent}30`,padding:16}}>
@@ -240,10 +311,34 @@ const DigestScreen=({navigate,activeChild})=> {
 const ActivityScreen=({navigate,activeChild})=> {
   const child=children[activeChild];
   const activity=activityByChild[activeChild];
+  const screenTime=screenTimeByChild[activeChild];
 
   return <div style={{display:"flex",flexDirection:"column",gap:16}}>
     <h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Activity</h1>
     <p style={{fontSize:13,color:C.textMuted,margin:0}}>What {child.name} has been working on</p>
+
+    {/* Weekly screen time bar chart */}
+    <Card style={{padding:16}}>
+      <p style={{fontSize:13,fontWeight:600,color:C.text,margin:"0 0 12px"}}>This week — screen time</p>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",height:100,gap:6}}>
+        {screenTime.week.map((d,i)=>{const total=d.active+d.passive+d.idle;const maxH=80;const h=total>0?Math.max(total/50*maxH,8):4;return <div key={i} style={{display:"flex",flexDirection:"column",alignItems:"center",flex:1,gap:4}}>
+          <div style={{width:"100%",height:maxH,display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
+            {total>0?<div style={{height:h,borderRadius:4,overflow:"hidden",display:"flex",flexDirection:"column"}}>
+              <div style={{flex:d.active,background:C.success,minHeight:d.active?2:0}}/>
+              <div style={{flex:d.passive,background:C.blue,minHeight:d.passive?2:0}}/>
+              <div style={{flex:d.idle,background:C.textFaint,minHeight:d.idle?1:0}}/>
+            </div>:<div style={{height:4,borderRadius:2,background:C.borderSoft}}/>}
+          </div>
+          <span style={{fontSize:10,color:C.textMuted,fontWeight:500}}>{d.day}</span>
+        </div>;})}
+      </div>
+      <div style={{display:"flex",gap:12,marginTop:10}}>
+        {[{label:"Active",color:C.success},{label:"Passive",color:C.blue},{label:"Idle",color:C.textFaint}].map(c=> <div key={c.label} style={{display:"flex",alignItems:"center",gap:4}}>
+          <div style={{width:6,height:6,borderRadius:"50%",background:c.color}}/>
+          <span style={{fontSize:10,color:C.textMuted}}>{c.label}</span>
+        </div>)}
+      </div>
+    </Card>
 
     {/* Streak calendar */}
     <Card style={{padding:16}}>

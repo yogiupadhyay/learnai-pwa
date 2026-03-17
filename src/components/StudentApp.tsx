@@ -15,7 +15,7 @@ const I=({n,s=24,c="currentColor",w=1.8,active})=>{const st={width:s,height:s,di
 const NavIcon=({name,active,color})=><div style={{position:"relative",display:"flex",alignItems:"center",justifyContent:"center",width:32,height:32,transition:"transform 0.25s cubic-bezier(0.34,1.56,0.64,1)",transform:active?"scale(1.15) translateY(-2px)":"scale(1)"}}>{active&&<div style={{position:"absolute",inset:-4,background:`${color}12`,borderRadius:12,animation:"navG 2s ease-in-out infinite"}}/>}<I n={name} s={22} c={color} w={active?2.2:1.6} active={active}/></div>;
 
 const Card=({children,style,onClick})=><div onClick={onClick} style={{background:C.card,borderRadius:20,padding:20,border:`1px solid ${C.border}`,...(onClick?{cursor:"pointer"}:{}),...style}}>{children}</div>;
-const Pill=({text,color=C.primary,bg,icon,style})=><span style={{display:"inline-flex",alignItems:"center",gap:5,padding:"5px 12px",borderRadius:999,fontSize:12,fontWeight:600,background:bg||`${color}15`,color,...style}}>{icon&&<I n={icon} s={14} c={color} w={2}/>}{text}</span>;
+const Pill=({text,color=C.primary,bg,icon,style,onClick})=><span onClick={onClick} style={{display:"inline-flex",alignItems:"center",gap:5,padding:"5px 12px",borderRadius:999,fontSize:12,fontWeight:600,background:bg||`${color}15`,color,...(onClick?{cursor:"pointer"}:{}),...style}}>{icon&&<I n={icon} s={14} c={color} w={2}/>}{text}</span>;
 const Btn=({children,variant="primary",style,onClick,full,icon})=>{const base={display:"inline-flex",alignItems:"center",justifyContent:"center",gap:8,height:48,padding:"0 24px",borderRadius:14,fontSize:15,fontWeight:700,cursor:"pointer",fontFamily:"inherit",border:"none",transition:"all 0.12s",...(full?{width:"100%"}:{})};const v={primary:{background:C.primary,color:"#fff"},accent:{background:C.accent,color:"#fff"},soft:{background:C.primarySoft,color:C.primary},ghost:{background:"transparent",color:C.primary,border:`1.5px solid ${C.border}`},success:{background:C.success,color:"#fff"},warn:{background:C.warnSoft,color:C.warnDark},danger:{background:C.errorSoft,color:C.errorDark},small:{height:36,padding:"0 14px",fontSize:13,borderRadius:10,background:C.primarySoft,color:C.primary}};return <button onClick={onClick} style={{...base,...v[variant],...style}}>{icon&&<I n={icon} s={18} c={v[variant]?.color||"#fff"} w={2}/>}{children}</button>;};
 const Ring=({value,max=100,size=64,stroke=5,color=C.primary,children})=>{const r=(size-stroke)/2,circ=2*Math.PI*r,off=circ-(value/max)*circ;return <div style={{position:"relative",width:size,height:size}}><svg width={size} height={size} style={{transform:"rotate(-90deg)"}}><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={`${color}20`} strokeWidth={stroke}/><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeDasharray={circ} strokeDashoffset={off} strokeLinecap="round" style={{transition:"stroke-dashoffset 0.6s ease"}}/></svg><div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>{children}</div></div>;};
 const Bar=({value,max=100,color=C.primary,h=6})=><div style={{width:"100%",height:h,background:`${color}20`,borderRadius:h,overflow:"hidden"}}><div style={{width:`${Math.min((value/max)*100,100)}%`,height:"100%",background:color,borderRadius:h,transition:"width 0.5s ease"}}/></div>;
@@ -25,7 +25,16 @@ const Confetti=({show})=>{if(!show)return null;const p=Array.from({length:20},(_
 const XPToast=({show,amount=10})=>{if(!show)return null;return <div style={{position:"absolute",top:70,left:"50%",transform:"translateX(-50%)",background:C.xp,color:"#fff",padding:"8px 20px",borderRadius:999,fontSize:14,fontWeight:700,zIndex:60,animation:"xpP 1.2s ease forwards",boxShadow:"0 4px 20px rgba(245,158,11,0.4)"}}><style>{`@keyframes xpP{0%{opacity:0;transform:translateX(-50%) translateY(10px) scale(0.8)}20%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.05)}40%{transform:translateX(-50%) translateY(0) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-30px)}}`}</style>+{amount} XP</div>;};
 
 /* ============ ASK BAR ============ */
-const AskBar=({onSubmit,onCamera})=>{const[q,setQ]=useState("");const[f,setF]=useState(false);const sugs=["Explain photosynthesis","What is Pythagoras theorem?","How does convection work?","Help me with fractions"];return <div style={{marginBottom:16}}><div style={{display:"flex",gap:8,alignItems:"center",padding:"10px 14px",borderRadius:16,border:`2px solid ${f?C.accent:C.border}`,background:C.card,transition:"border-color 0.2s"}}><I n="search" s={20} c={f?C.accent:C.textFaint}/><input value={q} onChange={e=>setQ(e.target.value)} onFocus={()=>setF(true)} onBlur={()=>setTimeout(()=>setF(false),200)} onKeyDown={e=>{if(e.key==="Enter"&&q.trim()){onSubmit(q);setQ("");}}} placeholder="Ask anything or type a topic..." style={{flex:1,border:"none",outline:"none",fontFamily:"inherit",fontSize:14,color:C.text,background:"transparent"}}/>{q.trim()?<button onClick={()=>{onSubmit(q);setQ("");}} style={{width:36,height:36,borderRadius:10,background:C.accent,border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><I n="send" s={16} c="#fff" w={2}/></button>:<button onClick={onCamera} style={{width:36,height:36,borderRadius:10,background:C.primarySoft,border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><I n="camera" s={16} c={C.primary} w={2}/></button>}</div>{f&&!q&&<div style={{marginTop:8,display:"flex",gap:6,flexWrap:"wrap"}}>{sugs.map(s=><button key={s} onClick={()=>{onSubmit(s);setF(false);}} style={{padding:"6px 12px",borderRadius:999,border:`1px solid ${C.border}`,background:C.borderSoft,cursor:"pointer",fontFamily:"inherit",fontSize:12,color:C.textMuted}}>{s}</button>)}</div>}</div>;};
+const AskBar=({onSubmit,onCamera})=>{const[q,setQ]=useState("");const[f,setF]=useState(false);const[isListening,setIsListening]=useState(false);const sugs=["Explain photosynthesis","What is Pythagoras theorem?","How does convection work?","Help me with fractions"];
+const startListening=()=>{setIsListening(true);setTimeout(()=>{setIsListening(false);setQ("How does convection work?");},2000);};
+return <div style={{marginBottom:16}}>
+<style>{`@keyframes micPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:0.7}} @keyframes waveBar{0%,100%{height:8px}50%{height:16px}}`}</style>
+<div style={{display:"flex",gap:8,alignItems:"center",padding:"10px 14px",borderRadius:16,border:`2px solid ${isListening?C.error:f?C.accent:C.border}`,background:C.card,transition:"border-color 0.2s"}}><I n="search" s={20} c={f?C.accent:C.textFaint}/><input value={q} onChange={e=>setQ(e.target.value)} onFocus={()=>setF(true)} onBlur={()=>setTimeout(()=>setF(false),200)} onKeyDown={e=>{if(e.key==="Enter"&&q.trim()){onSubmit(q);setQ("");}}} placeholder={isListening?"Listening...":"Ask anything or type a topic..."} style={{flex:1,border:"none",outline:"none",fontFamily:"inherit",fontSize:14,color:C.text,background:"transparent"}}/>
+{isListening&&<div style={{display:"flex",alignItems:"center",gap:2,marginRight:4}}>{[0,1,2].map(i=><div key={i} style={{width:3,borderRadius:2,background:C.error,animation:`waveBar 0.6s ${i*0.15}s ease-in-out infinite`}}/>)}</div>}
+<button onClick={isListening?()=>setIsListening(false):startListening} style={{width:36,height:36,borderRadius:10,background:isListening?C.error:C.borderSoft,border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",animation:isListening?"micPulse 1.2s ease-in-out infinite":"none",flexShrink:0}}>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={isListening?"#fff":C.textMuted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="1" width="6" height="12" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+</button>
+{q.trim()?<button onClick={()=>{onSubmit(q);setQ("");}} style={{width:36,height:36,borderRadius:10,background:C.accent,border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I n="send" s={16} c="#fff" w={2}/></button>:<button onClick={onCamera} style={{width:36,height:36,borderRadius:10,background:C.primarySoft,border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I n="camera" s={16} c={C.primary} w={2}/></button>}</div>{f&&!q&&<div style={{marginTop:8,display:"flex",gap:6,flexWrap:"wrap"}}>{sugs.map(s=><button key={s} onClick={()=>{onSubmit(s);setF(false);}} style={{padding:"6px 12px",borderRadius:999,border:`1px solid ${C.border}`,background:C.borderSoft,cursor:"pointer",fontFamily:"inherit",fontSize:12,color:C.textMuted}}>{s}</button>)}</div>}</div>;};
 
 /* ============ ONBOARDING ============ */
 const OnboardingScreen=({onComplete})=>{const[step,setStep]=useState(0);const[dqi,setDqi]=useState(0);const[dans,setDans]=useState({});
@@ -44,6 +53,7 @@ const HomeScreen=({navigate,xp,streak})=><div style={{display:"flex",flexDirecti
   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
     {[{label:"Challenge",sub:"Weekly contest",icon:"swords",screen:"challenge",color:C.accent},{label:"My Mistakes",sub:"Review errors",icon:"alert",screen:"mistakes",color:C.error},{label:"Exam Mode",sub:"Mock tests",icon:"exam",screen:"exam",color:C.error},{label:"Foundation",sub:"Catch-up plan",icon:"shield",screen:"foundation",color:C.primary}].map(a=><Card key={a.label} onClick={()=>navigate(a.screen)} style={{cursor:"pointer",padding:16}}><div style={{marginBottom:8}}><I n={a.icon} s={24} c={a.color}/></div><p style={{fontSize:13,fontWeight:700,color:C.text,margin:0}}>{a.label}</p><p style={{fontSize:11,color:C.textMuted,margin:"2px 0 0"}}>{a.sub}</p></Card>)}
   </div>
+  <MiniFeed navigate={navigate}/>
 </div>;
 
 /* ============ VISUAL EXPLAINERS ============ */
@@ -170,7 +180,43 @@ const WatchLearnBadge=()=><span style={{display:"inline-flex",alignItems:"center
 </span>;
 
 /* ============ TUTOR WITH VISUAL EXPLAINERS + READ ALOUD ============ */
-const TutorScreen=({navigate,addXP})=>{const[step,setStep]=useState(0);const[input,setInput]=useState("");const[reading,setReading]=useState(false);const[topic,setTopic]=useState(null);
+const TutorScreen=({navigate,addXP})=>{const[step,setStep]=useState(0);const[input,setInput]=useState("");const[reading,setReading]=useState(false);const[topic,setTopic]=useState(null);const[persona,setPersona]=useState("textbook");const[realWorldOpen,setRealWorldOpen]=useState({});
+const personaLabels={textbook:"Textbook",cricket:"Like cricket",story:"Like a story",game:"Like a game",cooking:"Like cooking",likeImFive:"Like I'm 5"};
+const personaContent={
+  fractions:{
+    cricket:[
+      "Imagine you scored 3 runs in 4 balls. That's 3/4. Your friend scored 1 in 2 balls — that's 1/2. To compare, we need the same number of balls...",
+      "To add fractions with different denominators, think of converting overs. If one bowler bowls 4-ball overs and another bowls 2-ball overs, convert to the same over length. 1/2 = 2/4, so 3/4 + 2/4 = 5/4."
+    ],
+    story:[
+      "Once upon a time, a pizza was cut into 4 slices. Someone ate 3 of them — that's 3/4 of the pizza gone...",
+      "To add fractions, imagine combining two pizzas cut differently. One has 4 slices (3 eaten), the other has 2 slices (1 eaten). Re-cut the second pizza into 4 slices — now 2 are eaten. Total eaten: 5 out of 4 slices = 5/4."
+    ],
+    cooking:[
+      "A recipe needs 3/4 cup of flour and 1/2 cup of sugar. To add them, we need the same measuring cup size...",
+      "Convert 1/2 cup to 2/4 cup — now both use quarter-cup measures. 3/4 + 2/4 = 5/4 cups total. That's 1 and 1/4 cups. Same idea for any fraction addition!"
+    ],
+    game:[
+      "You completed 3 out of 4 levels — that's 3/4. Your friend completed 1 out of 2 — that's 1/2. Who did more?...",
+      "To compare or add, make both scores out of the same number of levels. 1/2 = 2/4. Now: 3/4 + 2/4 = 5/4. Together you cleared more than a full set of levels!"
+    ],
+    likeImFive:[
+      "You have 4 candies and you ate 3. That's 3/4. Your friend has 2 candies and ate 1. That's 1/2...",
+      "To add your eaten candies together, make the candy bags the same size. Your friend's 1/2 becomes 2/4. Now 3/4 + 2/4 = 5/4 — more than a whole bag!"
+    ],
+  },
+  evaporation:{
+    cricket:["Think of a cricket pitch drying after rain. The sun heats the water, and the fastest water molecules escape into the air — just like batsmen running between wickets...","When the fastest molecules leave, the remaining water is slower and cooler. Like if the best batsmen get out, the run rate drops."],
+    story:["Once, a puddle sat in the sun. The tiny water drops got so excited from the heat that the fastest ones jumped right out into the air...","After the speediest drops left, the puddle felt cooler. The remaining drops didn't have as much energy — that's evaporative cooling."],
+    cooking:["When you boil water for tea, you see steam rising. The hottest water molecules escape first as vapor...","That's why a cup of hot chai cools down — the fastest molecules leave as steam, lowering the temperature of what's left."],
+    game:["Imagine a game where particles have speed points. When heated, the fastest particles reach escape velocity and leave the liquid...","After the speed-demons escape, the average speed of remaining particles drops. Lower speed = lower temperature. Level: Evaporative Cooling unlocked!"],
+    likeImFive:["When it's hot outside, water gets warm. The really fast tiny bits of water jump out into the air — like they're too excited to stay...","After the fast bits leave, the water left behind is slower and cooler. That's why you feel cold when you come out of a pool!"],
+  }
+};
+const realWorldData={
+  fractions:"Every time you split a pizza, share snacks equally, or read a cricket strike rate like 156.5 — you're using fractions. Chefs use fractions to scale recipes. Builders use fractions to measure materials. Even your phone battery is a fraction!",
+  evaporation:"This is why your room feels warm near the heater but cold near the window. Convection currents carry warm air up and away. It's also why coastal areas have sea breezes — the land heats faster than water, creating convection loops."
+};
 const topics={
   fractions:{
     title:"Fractions — Adding Unlike Denominators",subtitle:"3/4 + 1/2",
@@ -210,24 +256,44 @@ if(!topic)return <div style={{display:"flex",flexDirection:"column",gap:14}}>
 const tp=topics[topic];const cards=tp.cards;
 const adv=()=>{if(step<cards.length-1){setStep(s=>s+1);setInput("");addXP(5);}};
 const readAloud=(text)=>{if('speechSynthesis' in window){setReading(true);const u=new SpeechSynthesisUtterance(text);u.rate=0.9;u.onend=()=>setReading(false);speechSynthesis.cancel();speechSynthesis.speak(u);}};
+const getCardContent=(c,i)=>{
+  if(persona!=="textbook"&&personaContent[topic]&&personaContent[topic][persona]&&i<2){
+    return personaContent[topic][persona][i];
+  }
+  return c.content;
+};
 return <div style={{display:"flex",flexDirection:"column",gap:14}}>
   <div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>{setTopic(null);setStep(0);}}/><div style={{flex:1}}><p style={{fontSize:12,color:C.textMuted,margin:0}}>Solve with Tutor</p><p style={{fontSize:15,fontWeight:700,color:C.text,margin:0}}>{tp.title}</p></div><Pill icon="star" text="+5/step" color={C.xp} bg={C.warnSoft}/></div>
+  {/* Persona selector */}
+  <div style={{overflowX:"auto",display:"flex",gap:8,padding:"4px 0",WebkitOverflowScrolling:"touch"}}>{Object.entries(personaLabels).map(([k,v])=><button key={k} onClick={()=>setPersona(k)} style={{flexShrink:0,padding:"7px 14px",borderRadius:999,border:persona===k?"none":`1.5px solid ${C.border}`,background:persona===k?C.accent:"transparent",color:persona===k?"#fff":C.textMuted,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"inherit",transition:"all 0.2s"}}>{v}</button>)}</div>
   <div style={{display:"flex",gap:3}}>{cards.map((_,i)=><div key={i} style={{flex:1,height:4,borderRadius:2,background:i<=step?C.accent:C.border,transition:"background 0.3s"}}/>)}</div>
   {cards.slice(0,step+1).map((c,i)=>{
     const ExplainerComp=c.visual?VisualExplainerMap[c.visual.component]:null;
-    return <Card key={i} style={{borderLeft:`4px solid ${c.color}`,borderRadius:"4px 20px 20px 4px",padding:18}}>
+    const displayContent=getCardContent(c,i);
+    return <div key={i}><Card style={{borderLeft:`4px solid ${c.color}`,borderRadius:"4px 20px 20px 4px",padding:18}}>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <span style={{width:28,height:28,borderRadius:8,background:c.bg,display:"flex",alignItems:"center",justifyContent:"center"}}><I n={c.icon} s={16} c={c.color}/></span>
           <span style={{fontSize:11,fontWeight:700,color:c.color,textTransform:"uppercase",letterSpacing:0.5}}>{c.label}</span>
           {c.visual&&<WatchLearnBadge/>}
         </div>
-        {c.content&&!c.visual&&<button onClick={()=>readAloud(c.content)} style={{width:32,height:32,borderRadius:8,background:reading?`${C.accent}15`:C.borderSoft,border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><I n="volume" s={16} c={reading?C.accent:C.textMuted}/></button>}
+        {displayContent&&!c.visual&&<button onClick={()=>readAloud(displayContent)} style={{width:32,height:32,borderRadius:8,background:reading?`${C.accent}15`:C.borderSoft,border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><I n="volume" s={16} c={reading?C.accent:C.textMuted}/></button>}
       </div>
-      {c.content&&<p style={{fontSize:14,color:C.text,margin:"0 0 12px",lineHeight:1.65}}>{c.content}</p>}
+      {persona!=="textbook"&&i<2&&<span style={{display:"inline-flex",alignItems:"center",gap:4,padding:"3px 10px",borderRadius:999,fontSize:10,fontWeight:600,background:`${C.accent}12`,color:C.accent,marginBottom:8}}>Explaining {personaLabels[persona].toLowerCase()}</span>}
+      {displayContent&&<p style={{fontSize:14,color:C.text,margin:"0 0 12px",lineHeight:1.65}}>{displayContent}</p>}
       {ExplainerComp&&<ExplainerComp {...(c.visual.props||{})}/>}
       {c.hasInput&&i===step&&<div style={{marginTop:12}}><textarea value={input} onChange={e=>setInput(e.target.value)} placeholder="Type your answer..." style={{width:"100%",minHeight:56,padding:"10px 14px",borderRadius:12,border:`1.5px solid ${C.border}`,fontFamily:"inherit",fontSize:13,resize:"vertical",boxSizing:"border-box",outline:"none"}}/><Btn variant="accent" onClick={adv} style={{marginTop:8,height:40,fontSize:13}}>Submit</Btn></div>}
-    </Card>;
+    </Card>
+    {/* Real world connect */}
+    {realWorldData[topic]&&<div style={{marginTop:6}}>
+      <button onClick={()=>setRealWorldOpen(o=>({...o,[i]:!o[i]}))} style={{display:"flex",alignItems:"center",gap:8,width:"100%",padding:"10px 14px",borderRadius:12,border:`1px solid ${C.border}`,background:C.borderSoft,cursor:"pointer",fontFamily:"inherit",fontSize:12,fontWeight:600,color:C.textMuted}}>
+        <I n="spark" s={14} c={C.warn}/><span style={{flex:1,textAlign:"left"}}>Why does this matter?</span><I n="chevD" s={14} c={C.textMuted}/>
+      </button>
+      {realWorldOpen[i]&&<div style={{marginTop:6,padding:14,borderRadius:14,background:"linear-gradient(135deg, #FEF3C7, #FFEDD5)",border:`1px solid ${C.warn}30`}}>
+        <p style={{fontSize:13,color:C.warnDark,margin:0,lineHeight:1.6}}>{realWorldData[topic]}</p>
+      </div>}
+    </div>}
+    </div>;
   })}
   {step<cards.length-1&&!cards[step].hasInput&&<Btn full onClick={adv} variant="accent">Continue</Btn>}
 </div>;};
@@ -341,6 +407,7 @@ return <div style={{display:"flex",flexDirection:"column",gap:16}}>
       {exp===ch.id&&<div style={{padding:"0 18px 14px"}}>{ch.topics.map((t,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 0",borderTop:i?`1px solid ${C.borderSoft}`:"none"}}>
         <Dot level={t.l}/><span style={{fontSize:13,color:C.text,flex:1}}>{t.name}</span>
         {viewMode==="growth"?<span style={{fontSize:11,color:C.success,marginRight:6}}>+{t.s-t.start}%</span>:<span style={{fontSize:11,color:C.textMuted,marginRight:6}}>{t.s}%</span>}
+        {t.s>=60&&<Pill text="Teach it" color={C.accent} bg={C.accentSoft} style={{cursor:"pointer",fontSize:11,padding:"3px 10px"}} onClick={()=>navigate("teachback")}/>}
         <Btn variant="small" onClick={()=>navigate("quiz")}>Practice</Btn>
       </div>)}</div>}
     </Card>
@@ -382,6 +449,31 @@ const ChallengeScreen=({navigate})=>{
     </div>
   </div>;
 };
+
+/* ============ TEACH IT BACK ============ */
+const TeachBackScreen=({navigate,addXP})=>{const[tbInput,setTbInput]=useState("");const[tbResult,setTbResult]=useState(null);
+const evaluate=(text)=>{const t=text.toLowerCase();if(t.includes("denominator")||t.includes("common"))return "green";if(t.includes("divide")||t.includes("top by bottom"))return "red";return "orange";};
+const submit=()=>{if(!tbInput.trim())return;const r=evaluate(tbInput);setTbResult(r);addXP(20);};
+const resultMsg={green:{text:"Excellent explanation! You clearly understand the concept.",bg:C.successSoft,border:C.success,color:C.successDark,icon:"check"},red:{text:"Hmm, there might be a misconception. Dividing top by bottom isn't quite right for adding fractions.",bg:C.errorSoft,border:C.error,color:C.errorDark,icon:"alert"},orange:{text:"Good attempt! Try mentioning common denominators to make your explanation clearer.",bg:C.warnSoft,border:C.warn,color:C.warnDark,icon:"brain"}};
+return <div style={{display:"flex",flexDirection:"column",gap:16}}>
+  <div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>navigate("journey")}/><h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Teach it back</h1></div>
+  <Card style={{background:C.accentSoft,border:`1px solid ${C.accent}30`,padding:20,textAlign:"center"}}>
+    <svg width="48" height="48" viewBox="0 0 48 48" style={{margin:"0 auto 12px",display:"block"}}><circle cx="24" cy="24" r="22" fill="#E9D5FF" stroke="#7C3AED" strokeWidth="2"/><circle cx="17" cy="20" r="2" fill="#7C3AED"/><circle cx="31" cy="20" r="2" fill="#7C3AED"/><path d="M16 32 Q24 26 32 32" stroke="#7C3AED" strokeWidth="2" fill="none" strokeLinecap="round"/><text x="36" y="14" fontSize="14">?</text></svg>
+    <p style={{fontSize:15,fontWeight:700,color:C.accent,margin:"0 0 4px"}}>Pretend I'm your friend who doesn't understand Fractions.</p>
+    <p style={{fontSize:13,color:C.textMuted,margin:0}}>Can you explain it to me?</p>
+  </Card>
+  {!tbResult&&<>
+    <textarea value={tbInput} onChange={e=>setTbInput(e.target.value)} placeholder="Explain fractions in your own words..." style={{width:"100%",minHeight:120,padding:"14px 16px",borderRadius:14,border:`1.5px solid ${C.border}`,fontFamily:"inherit",fontSize:14,resize:"vertical",boxSizing:"border-box",outline:"none",lineHeight:1.6,color:C.text}}/>
+    <Btn full onClick={submit} variant="accent" icon="send">Submit explanation</Btn>
+  </>}
+  {tbResult&&<>
+    <Card style={{background:resultMsg[tbResult].bg,border:`1px solid ${resultMsg[tbResult].border}30`,padding:16,display:"flex",alignItems:"flex-start",gap:12}}>
+      <I n={resultMsg[tbResult].icon} s={20} c={resultMsg[tbResult].color}/><p style={{fontSize:14,color:resultMsg[tbResult].color,margin:0,lineHeight:1.6}}>{resultMsg[tbResult].text}</p>
+    </Card>
+    <Pill icon="star" text="+20 XP for teaching!" color={C.xp} bg={C.warnSoft} style={{alignSelf:"center",fontSize:14,padding:"8px 18px"}}/>
+    <div style={{display:"flex",gap:10}}><Btn variant="ghost" onClick={()=>{setTbInput("");setTbResult(null);}} style={{flex:1}}>Try again</Btn><Btn onClick={()=>navigate("journey")} style={{flex:1}}>Back to Journey</Btn></div>
+  </>}
+</div>;};
 
 /* ============ EXAM MODE WITH PRACTICE OPTION ============ */
 const ExamScreen=({navigate})=>{const[mode,setMode]=useState(null);
@@ -465,6 +557,14 @@ const ProfileScreen=({navigate,xp,streak})=>{
       <div style={{display:"flex",gap:8,justifyContent:"center",marginTop:12}}><Pill icon="star" text={`${xp} XP`} bg="rgba(255,255,255,0.2)" color="#fff"/><Pill icon="fire" text={`${streak}d`} bg="rgba(255,255,255,0.2)" color="#fff"/><Pill text="Lvl 12" bg="rgba(255,255,255,0.2)" color="#fff"/></div>
     </Card>
     <Card style={{padding:16}}><p style={{fontSize:13,fontWeight:600,color:C.text,margin:"0 0 10px"}}>Streak (14 days)</p><div style={{display:"flex",gap:4,justifyContent:"center"}}>{streakDays.map((d,i)=><div key={i} style={{width:20,height:20,borderRadius:4,background:d?C.success:C.borderSoft,display:"flex",alignItems:"center",justifyContent:"center"}}>{d===1&&<I n="check" s={12} c="#fff" w={2.5}/>}</div>)}</div></Card>
+    <div><p style={{fontSize:13,fontWeight:700,color:C.text,margin:"0 0 10px",textTransform:"uppercase",letterSpacing:0.5}}>Your moments</p>
+      <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:16}}>
+        {[{text:"You solved a problem that 80% of Class 7 gets wrong",icon:"star",color:C.accent,bg:C.accentSoft,time:"2 days ago"},{text:"Your fractions mastery went from 32% to 62% in 1 week",icon:"zap",color:C.success,bg:C.successSoft,time:"3 days ago"},{text:"You taught the AI about convection and nailed it",icon:"brain",color:C.primary,bg:C.primarySoft,time:"5 days ago"},{text:"142 questions answered this month",icon:"trophy",color:C.streak,bg:`${C.streak}15`,time:"This month"}].map((m,i)=><Card key={i} style={{background:m.bg,border:`1px solid ${m.color}30`,padding:14,display:"flex",alignItems:"flex-start",gap:12}}>
+          <div style={{width:32,height:32,borderRadius:10,background:`${m.color}20`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I n={m.icon} s={16} c={m.color}/></div>
+          <div style={{flex:1}}><p style={{fontSize:13,fontWeight:700,color:C.text,margin:0,lineHeight:1.4}}>{m.text}</p><p style={{fontSize:11,color:C.textMuted,margin:"4px 0 0"}}>{m.time}</p></div>
+        </Card>)}
+      </div>
+    </div>
     <div><p style={{fontSize:13,fontWeight:700,color:C.text,margin:"0 0 10px",textTransform:"uppercase",letterSpacing:0.5}}>Badges ({badges.filter(b=>b.earned).length}/{badges.length})</p>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>{badges.map((b,i)=><Card key={i} style={{padding:14,textAlign:"center",opacity:b.earned?1:0.4}}>
         <div style={{width:44,height:44,borderRadius:14,background:b.earned?`${b.color}15`:C.borderSoft,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 8px"}}>{b.earned?<I n={b.icon} s={22} c={b.color}/>:<I n="lock" s={18} c={C.textFaint}/>}</div>
@@ -474,6 +574,50 @@ const ProfileScreen=({navigate,xp,streak})=>{
     <Card style={{padding:0}}>{[{label:"Notifications",icon:"bell"},{label:"Offline packs",icon:"grid"},{label:"Settings",icon:"user"}].map((item,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"14px 18px",borderTop:i?`1px solid ${C.borderSoft}`:"none",cursor:"pointer"}}><I n={item.icon} s={20} c={C.textMuted}/><span style={{fontSize:14,color:C.text,flex:1}}>{item.label}</span><I n="arrowR" s={16} c={C.textFaint}/></div>)}</Card>
   </div>;
 };
+
+/* ============ CLASS STORIES FEED ============ */
+const StoriesScreen=({navigate})=>{const[filter,setFilter]=useState("myclass");
+const stories=[
+  {type:"achievement",bg:C.successSoft,border:C.success,icon:"star",color:C.successDark,name:"Priya",text:"Priya just mastered Convection!",reactions:14},
+  {type:"streak",bg:`${C.streak}15`,border:C.streak,icon:"fire",color:C.streak,name:"Karan",text:"Karan is on a 7-day streak!",reactions:8},
+  {type:"milestone",bg:C.primarySoft,border:C.primary,icon:"trendUp",color:C.primary,name:"Class 6-B",text:"Class 6-B average crossed 60%!",extra:{before:48,after:62},reactions:23},
+  {type:"announcement",bg:C.accentSoft,border:C.accent,icon:"book",color:C.accent,name:"Ms. Sharma",text:"Great work on Heat chapter! Starting Light chapter next week. Prepare by reviewing reflection basics.",reactions:11},
+  {type:"challenge",bg:`${C.xp}15`,border:C.xp,icon:"trophy",color:C.xp,name:"Weekly",text:"Weekly Challenge top 3:",extra:{leaders:["Riya S. — 520 XP","Aarav S. — 480 XP","Arjun K. — 340 XP"]},reactions:19},
+  {type:"helpful",bg:"#CCFBF120",border:"#14B8A6",icon:"brain",color:"#0D9488",name:"Aarav",text:"Aarav answered 5 ask-bar questions today!",reactions:6},
+];
+return <div style={{display:"flex",flexDirection:"column",gap:16}}>
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Class 6-B Feed</h1></div>
+  <div style={{display:"flex",gap:8}}>
+    {[{id:"myclass",label:"My class"},{id:"all",label:"All classes"}].map(f=><button key={f.id} onClick={()=>setFilter(f.id)} style={{padding:"7px 16px",borderRadius:999,border:filter===f.id?"none":`1.5px solid ${C.border}`,background:filter===f.id?C.primary:"transparent",color:filter===f.id?"#fff":C.textMuted,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>{f.label}</button>)}
+  </div>
+  {stories.map((s,i)=><Card key={i} style={{background:s.bg,border:`1px solid ${s.border}30`,padding:16}}>
+    <div style={{display:"flex",alignItems:"flex-start",gap:12}}>
+      <div style={{width:36,height:36,borderRadius:10,background:`${s.border}20`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I n={s.icon} s={18} c={s.color}/></div>
+      <div style={{flex:1}}>
+        <p style={{fontSize:11,fontWeight:600,color:s.color,margin:"0 0 4px",textTransform:"uppercase",letterSpacing:0.3}}>{s.name}</p>
+        <p style={{fontSize:14,fontWeight:600,color:C.text,margin:0,lineHeight:1.5}}>{s.text}</p>
+        {s.extra?.before!=null&&<div style={{marginTop:10,display:"flex",alignItems:"center",gap:10}}>
+          <div style={{flex:1}}><p style={{fontSize:11,color:C.textMuted,margin:"0 0 4px"}}>Before</p><Bar value={s.extra.before} max={100} color={C.textMuted} h={6}/></div>
+          <I n="arrowR" s={14} c={C.textMuted}/>
+          <div style={{flex:1}}><p style={{fontSize:11,color:C.success,margin:"0 0 4px"}}>After</p><Bar value={s.extra.after} max={100} color={C.success} h={6}/></div>
+        </div>}
+        {s.extra?.leaders&&<div style={{marginTop:8}}>{s.extra.leaders.map((l,j)=><p key={j} style={{fontSize:12,color:C.text,margin:"2px 0",fontWeight:j===0?700:400}}>{j===0?"🥇":j===1?"🥈":"🥉"} {l}</p>)}</div>}
+      </div>
+    </div>
+    <div style={{display:"flex",justifyContent:"flex-end",marginTop:10}}>
+      <button style={{display:"flex",alignItems:"center",gap:4,padding:"5px 12px",borderRadius:999,border:`1px solid ${C.border}`,background:C.card,cursor:"pointer",fontFamily:"inherit",fontSize:12,color:C.textMuted}}>Nice! ({s.reactions})</button>
+    </div>
+  </Card>)}
+</div>;};
+
+const MiniFeed=({navigate})=>{
+const miniStories=[{icon:"star",color:C.successDark,bg:C.successSoft,text:"Priya just mastered Convection!"},{icon:"fire",color:C.streak,bg:`${C.streak}15`,text:"Karan is on a 7-day streak!"}];
+return <div style={{marginTop:4}}>
+  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}><p style={{fontSize:13,fontWeight:700,color:C.text,margin:0}}>Class Feed</p><button onClick={()=>navigate("stories")} style={{background:"transparent",border:"none",cursor:"pointer",fontFamily:"inherit",fontSize:12,fontWeight:600,color:C.primary}}>See all →</button></div>
+  {miniStories.map((s,i)=><div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",borderRadius:14,background:s.bg,marginBottom:6}}>
+    <I n={s.icon} s={16} c={s.color}/><span style={{fontSize:12,fontWeight:500,color:C.text}}>{s.text}</span>
+  </div>)}
+</div>;};
 
 /* ============ REVISION / PHOTO / BOOSTER — compact ============ */
 const RevisionScreen=({navigate})=>{const days=["M","T","W","T","F","S","S"],today=0,active=[0,1,3,6];return <div style={{display:"flex",flexDirection:"column",gap:16}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}><h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Revision</h1><Pill icon="check" text="Good" color={C.success} bg={C.successSoft}/></div><Card style={{padding:14}}><div style={{display:"flex",justifyContent:"space-between"}}>{days.map((d,i)=><div key={i} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:5}}><span style={{fontSize:11,color:i===today?C.primary:C.textMuted,fontWeight:i===today?700:400}}>{d}</span><div style={{width:34,height:34,borderRadius:"50%",background:i===today?C.primary:active.includes(i)?C.primarySoft:"transparent",border:active.includes(i)?"none":`1.5px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:i===today?700:400,color:i===today?"#fff":C.textMuted}}>{10+i}</div></div>)}</div></Card><div><p style={{fontSize:11,fontWeight:700,color:C.error,margin:"0 0 8px",textTransform:"uppercase",letterSpacing:0.8}}>Overdue</p><Card style={{borderLeft:`4px solid ${C.error}`,borderRadius:"4px 20px 20px 4px",display:"flex",alignItems:"center",justifyContent:"space-between",padding:16}}><div style={{display:"flex",alignItems:"center",gap:10}}><Dot level="weak"/><div><p style={{fontSize:14,fontWeight:600,color:C.text,margin:0}}>Fractions</p><p style={{fontSize:11,color:C.textMuted,margin:"2px 0 0"}}>Math • 5 min</p></div></div><Btn variant="warn" onClick={()=>navigate("quiz")} style={{height:34,fontSize:12,padding:"0 14px"}}>Start</Btn></Card></div><div><p style={{fontSize:11,fontWeight:700,color:C.warn,margin:"0 0 8px",textTransform:"uppercase",letterSpacing:0.8}}>Due today</p>{[{t:"Heat",tm:"5 min"},{t:"Conduction",tm:"4 min"}].map((item,i)=><Card key={i} style={{borderLeft:`4px solid ${C.warn}`,borderRadius:"4px 20px 20px 4px",display:"flex",alignItems:"center",justifyContent:"space-between",padding:16,marginBottom:8}}><div style={{display:"flex",alignItems:"center",gap:10}}><Dot level="practicing"/><div><p style={{fontSize:14,fontWeight:600,color:C.text,margin:0}}>{item.t}</p><p style={{fontSize:11,color:C.textMuted,margin:"2px 0 0"}}>Science • {item.tm}</p></div></div><Btn variant="small" onClick={()=>navigate("quiz")}>Start</Btn></Card>)}</div></div>;};
@@ -492,9 +636,36 @@ const BoosterScreen=({navigate,addXP})=>{const[stage,setStage]=useState(0);retur
 const NotifScreen=({navigate})=>{const notifs=[{title:"Streak about to break!",body:"Complete a mission to keep your 3-day streak.",time:"2h",icon:"fire",color:C.streak,action:"quiz"},{title:"New assignment from Ms. Sharma",body:"Fractions (10 questions)",time:"4h",icon:"book",color:C.accent,action:"quiz"},{title:"Weekly challenge is live",body:"5 hardest Heat questions — bonus 50 XP",time:"6h",icon:"swords",color:C.accent,action:"challenge"},{title:"Badge unlocked!",body:"Quiz Master — 25 quizzes completed!",time:"1d",icon:"trophy",color:C.xp,action:"profile"}];
 return <div style={{display:"flex",flexDirection:"column",gap:16}}><div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>navigate("home")}/><h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Notifications</h1></div>{notifs.map((n,i)=><Card key={i} onClick={()=>navigate(n.action)} style={{cursor:"pointer",padding:16,display:"flex",gap:14,alignItems:"flex-start",...(i===0?{background:`${n.color}08`,border:`1px solid ${n.color}30`}:{})}}><div style={{width:40,height:40,borderRadius:12,background:`${n.color}15`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><I n={n.icon} s={20} c={n.color}/></div><div style={{flex:1}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline"}}><p style={{fontSize:14,fontWeight:600,color:C.text,margin:0}}>{n.title}</p><span style={{fontSize:11,color:C.textFaint,flexShrink:0,marginLeft:8}}>{n.time}</span></div><p style={{fontSize:12,color:C.textMuted,margin:"4px 0 0"}}>{n.body}</p></div></Card>)}</div>;};
 
+/* ============ STUDY BUDDY ============ */
+const BuddyPanel=({navigate,onClose,streak})=>{
+const messages=[
+  ...(streak>=3?[{text:`${streak} days in a row! You're on fire! Keep the streak going.`,action:"quiz",actionLabel:"Do a mission",color:C.streak}]:[{text:"Hey! You haven't started today's mission yet. Let's go!",action:"quiz",actionLabel:"Start mission",color:C.primary}]),
+  {text:"I noticed Convection is still tricky. Want to practice?",action:"tutor",actionLabel:"Practice now",color:C.accent},
+  {text:"Fun fact: you've answered 142 questions this month!",action:"profile",actionLabel:"See stats",color:C.success},
+];
+return <div style={{position:"absolute",bottom:80,left:12,right:12,maxHeight:"60%",background:C.card,borderRadius:20,boxShadow:"0 8px 40px rgba(0,0,0,0.15)",border:`1px solid ${C.border}`,zIndex:45,display:"flex",flexDirection:"column",overflow:"hidden",animation:"buddySlide 0.3s ease forwards"}}>
+  <style>{`@keyframes buddySlide{0%{transform:translateY(20px);opacity:0}100%{transform:translateY(0);opacity:1}}`}</style>
+  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 18px",borderBottom:`1px solid ${C.borderSoft}`}}>
+    <div style={{display:"flex",alignItems:"center",gap:10}}>
+      {/* Spark avatar */}
+      <div style={{width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg, #7C3AED, #2563EB)",display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
+        <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="8" r="6" fill="#fff" opacity="0.3"/><circle cx="7" cy="7" r="1.5" fill="#fff"/><circle cx="13" cy="7" r="1.5" fill="#fff"/><path d="M7 11 Q10 14 13 11" stroke="#fff" strokeWidth="1.2" fill="none" strokeLinecap="round"/></svg>
+      </div>
+      <div><p style={{fontSize:14,fontWeight:700,color:C.text,margin:0}}>Spark</p><p style={{fontSize:11,color:C.textMuted,margin:0}}>Your study buddy</p></div>
+    </div>
+    <button onClick={onClose} style={{width:28,height:28,borderRadius:8,background:C.borderSoft,border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><I n="x" s={16} c={C.textMuted}/></button>
+  </div>
+  <div style={{flex:1,overflowY:"auto",padding:14,display:"flex",flexDirection:"column",gap:10}}>
+    {messages.map((m,i)=><div key={i} style={{background:C.borderSoft,borderRadius:16,borderTopLeftRadius:4,padding:14}}>
+      <p style={{fontSize:13,color:C.text,margin:"0 0 10px",lineHeight:1.5}}>{m.text}</p>
+      <button onClick={()=>{navigate(m.action);onClose();}} style={{padding:"6px 14px",borderRadius:999,border:"none",background:`${m.color}15`,color:m.color,fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"inherit"}}>{m.actionLabel}</button>
+    </div>)}
+  </div>
+</div>;};
+
 /* ============ APP SHELL ============ */
 export default function App(){
-  const[onboarded,setOnboarded]=useState(false);const[screen,setScreen]=useState("home");const[xp,setXP]=useState(240);const[streak]=useState(3);const scrollRef=useRef(null);
+  const[onboarded,setOnboarded]=useState(false);const[screen,setScreen]=useState("home");const[xp,setXP]=useState(240);const[streak]=useState(3);const scrollRef=useRef(null);const[buddyOpen,setBuddyOpen]=useState(false);
   const navigateRef=useRef(null);
   const navigate=(s)=>{setOnboarded(true);setScreen(s);scrollRef.current?.scrollTo(0,0);};const addXP=(n)=>setXP(x=>x+n);
   navigateRef.current=navigate;
@@ -502,9 +673,10 @@ export default function App(){
 
   if(!onboarded)return <div style={{fontFamily:'"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',maxWidth:"100%",margin:"0 auto",background:C.bg,minHeight:"100vh",borderRadius:0,overflow:"hidden",boxShadow:"none",position:"relative"}}><OnboardingScreen onComplete={()=>setOnboarded(true)}/></div>;
 
-  const navItems=[{id:"home",icon:"home",label:"Home"},{id:"journey",icon:"journey",label:"Journey"},{id:"exam",icon:"exam",label:"Exams"},{id:"revision",icon:"revision",label:"Revision"}];
-  const screens={home:<HomeScreen navigate={navigate} xp={xp} streak={streak}/>,quiz:<QuizScreen navigate={navigate} addXP={addXP}/>,tutor:<TutorScreen navigate={navigate} addXP={addXP}/>,journey:<JourneyScreen navigate={navigate}/>,revision:<RevisionScreen navigate={navigate}/>,booster:<BoosterScreen navigate={navigate} addXP={addXP}/>,photo:<PhotoScreen navigate={navigate}/>,exam:<ExamScreen navigate={navigate}/>,mistakes:<MistakeScreen navigate={navigate}/>,notifs:<NotifScreen navigate={navigate}/>,profile:<ProfileScreen navigate={navigate} xp={xp} streak={streak}/>,challenge:<ChallengeScreen navigate={navigate}/>,foundation:<FoundationScreen navigate={navigate}/>};
-  const activeNav=["quiz","tutor","booster","photo","mistakes","notifs","profile","challenge","foundation"].includes(screen)?"home":screen;
+  const navItems=[{id:"home",icon:"home",label:"Home"},{id:"journey",icon:"journey",label:"Journey"},{id:"exam",icon:"exam",label:"Exams"},{id:"stories",icon:"gallery",label:"Feed"}];
+  const screens={home:<HomeScreen navigate={navigate} xp={xp} streak={streak}/>,quiz:<QuizScreen navigate={navigate} addXP={addXP}/>,tutor:<TutorScreen navigate={navigate} addXP={addXP}/>,journey:<JourneyScreen navigate={navigate}/>,revision:<RevisionScreen navigate={navigate}/>,booster:<BoosterScreen navigate={navigate} addXP={addXP}/>,photo:<PhotoScreen navigate={navigate}/>,exam:<ExamScreen navigate={navigate}/>,mistakes:<MistakeScreen navigate={navigate}/>,notifs:<NotifScreen navigate={navigate}/>,profile:<ProfileScreen navigate={navigate} xp={xp} streak={streak}/>,challenge:<ChallengeScreen navigate={navigate}/>,foundation:<FoundationScreen navigate={navigate}/>,teachback:<TeachBackScreen navigate={navigate} addXP={addXP}/>,stories:<StoriesScreen navigate={navigate}/>};
+  const activeNav=["quiz","tutor","booster","photo","mistakes","notifs","profile","challenge","foundation"].includes(screen)?"home":["teachback"].includes(screen)?"journey":screen;
+  const showBuddy=["home","journey","stories"].includes(screen);
 
   return <div style={{fontFamily:'"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',maxWidth:"100%",margin:"0 auto",background:C.bg,minHeight:"100vh",display:"flex",flexDirection:"column",borderRadius:0,overflow:"hidden",boxShadow:"none",position:"relative"}}>
     <style>{`@keyframes navG{0%,100%{opacity:0.6}50%{opacity:1}}`}</style>
@@ -518,6 +690,12 @@ export default function App(){
       </div>
     </div>
     <div ref={scrollRef} style={{flex:1,overflowY:"auto",padding:"4px 20px 110px"}}>{screens[screen]||screens.home}</div>
+    {/* Study buddy */}
+    {buddyOpen&&showBuddy&&<BuddyPanel navigate={navigate} onClose={()=>setBuddyOpen(false)} streak={streak}/>}
+    {showBuddy&&!buddyOpen&&<button onClick={()=>setBuddyOpen(true)} style={{position:"absolute",bottom:90,right:20,width:48,height:48,borderRadius:"50%",background:"linear-gradient(135deg, #7C3AED, #2563EB)",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 20px rgba(124,58,237,0.4)",zIndex:40}}>
+      <I n="spark" s={22} c="#fff" w={2}/>
+      <div style={{position:"absolute",top:0,right:0,width:10,height:10,borderRadius:"50%",background:C.error,border:"2px solid #fff"}}/>
+    </button>}
     <div style={{position:"absolute",bottom:0,left:0,right:0,background:"rgba(255,255,255,0.97)",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",borderTop:`1px solid ${C.border}`,display:"flex",justifyContent:"space-around",padding:"8px 0 24px"}}>
       {navItems.map(item=>{const isActive=activeNav===item.id;return <button key={item.id} onClick={()=>navigate(item.id)} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,padding:"4px 20px",background:"transparent",border:"none",cursor:"pointer",fontFamily:"inherit",color:isActive?C.primary:C.textFaint,fontSize:10,fontWeight:isActive?700:500,transition:"color 0.2s"}}><NavIcon name={item.icon} active={isActive} color={isActive?C.primary:C.textFaint}/><span>{item.label}</span></button>;})}
     </div>
