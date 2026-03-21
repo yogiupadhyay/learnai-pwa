@@ -36,9 +36,10 @@ const Ring=({value,max=100,size=64,stroke=5,color=C.primary,children})=>{const r
 const Back=({onClick})=> <button onClick={onClick} style={{background:"transparent",border:"none",cursor:"pointer",padding:4,display:"flex",color:C.textMuted}}><I n="arrowL" s={22} c={C.textMuted}/></button>;
 
 /* ============ DATA ============ */
+// MOCK DATA — In production, fetched from API. Parent sees only their own children.
 const children=[
-  {name:"Aarav",class:"Class 6-B",school:"Delhi Public School",board:"CBSE",mastery:62,growth:24,streak:3,xp:240,level:12,quizzes:18,tutorSessions:12,photoQs:5,lastActive:"4h ago",teacher:"Ms. Sharma"},
-  {name:"Ananya",class:"Class 4-A",school:"Delhi Public School",board:"CBSE",mastery:45,growth:12,streak:1,xp:80,level:5,quizzes:6,tutorSessions:4,photoQs:2,lastActive:"1d ago",teacher:"Mrs. Singh"},
+  {name:"Aarav Patel",class:"Class 6-B",school:"Delhi Public School",board:"CBSE",mastery:62,growth:24,streak:3,xp:240,level:12,quizzes:18,tutorSessions:12,photoQs:5,lastActive:"4h ago",teacher:"Ms. Sharma"},
+  {name:"Ananya Patel",class:"Class 4-A",school:"Delhi Public School",board:"CBSE",mastery:45,growth:12,streak:1,xp:80,level:5,quizzes:6,tutorSessions:4,photoQs:2,lastActive:"1d ago",teacher:"Mrs. Singh"},
 ];
 
 const subjectsByChild=[

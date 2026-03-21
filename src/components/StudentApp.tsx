@@ -120,6 +120,8 @@ return <div style={{display:"flex",flexDirection:"column",gap:0,padding:"24px 20
   </div>
 </div>;};
 
+// MOCK DATA — In production, fetched from API. Student sees only their own data.
+
 /* ============ HOME ============ */
 const HomeScreen=({navigate,xp,streak})=><div style={{display:"flex",flexDirection:"column",gap:16}}>
   <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}><div><p style={{fontSize:13,color:C.textMuted,margin:0}}>Good evening</p><h1 style={{fontSize:26,fontWeight:800,color:C.text,margin:"2px 0 0",letterSpacing:-0.5}}>Aarav</h1></div><div style={{display:"flex",gap:8}}><Pill icon="fire" text={`${streak}`} color={C.streak} bg={`${C.streak}15`}/><Pill icon="star" text={`${xp}`} color={C.xp} bg={`${C.xp}15`}/></div></div>
@@ -299,7 +301,7 @@ const topics={
     title:"Fractions — Adding Unlike Denominators",subtitle:"3/4 + 1/2",
     cards:[
       {type:"visual_explainer",icon:"play",label:"Watch",color:"#06B6D4",bg:"#ECFEFF",content:"Watch how we add 3/4 + 1/2 by finding common denominators:",visual:{type:"animation",component:"fraction-bar",props:{}}},
-      {type:"concept",icon:"spark",label:"Key Idea",color:C.primary,bg:C.primarySoft,content:"To add fractions with different denominators, first convert them so both have the same denominator. Multiply top and bottom of each fraction until the bottoms match. Here: 1/2 = 2/4, so 3/4 + 2/4 = 5/4."},
+      {type:"concept",icon:"spark",label:"Key Idea",color:C.primary,bg:C.primarySoft,content:"To add fractions with different denominators, first convert them so both have the same denominator. Multiply top and bottom of each fraction until the bottoms match. Here: 1/2 = 2/4, so 3/4 + 2/4 = 5/4.",source:"NCERT Math, Ch.7 — Fractions"},
       {type:"think",icon:"brain",label:"Think",color:C.accent,bg:C.accentSoft,content:"What would you multiply 1/3 by to get a denominator of 12?",hasInput:true},
       {type:"feedback",icon:"check",label:"Correct",color:C.success,bg:C.successSoft,content:"Multiply by 4/4. Since 3 × 4 = 12, we get 1/3 = 4/12. Always multiply top and bottom by the same number!"},
       {type:"practice",icon:"target",label:"Your turn",color:C.warn,bg:C.warnSoft,content:"Solve: 2/3 + 1/6. What is the answer in simplest form?",hasInput:true},
@@ -309,7 +311,7 @@ const topics={
     title:"Evaporation & Cooling",subtitle:"Convection & heat transfer",
     cards:[
       {type:"visual_explainer",icon:"play",label:"Watch",color:"#06B6D4",bg:"#ECFEFF",content:"See how heat creates convection currents in a fluid:",visual:{type:"animation",component:"beaker",props:{}}},
-      {type:"concept",icon:"spark",label:"Concept",color:C.primary,bg:C.primarySoft,content:"When a liquid is heated, the fastest (highest-energy) molecules rise. Cooler, denser molecules sink to take their place. This creates a circular flow called a convection current."},
+      {type:"concept",icon:"spark",label:"Concept",color:C.primary,bg:C.primarySoft,content:"When a liquid is heated, the fastest (highest-energy) molecules rise. Cooler, denser molecules sink to take their place. This creates a circular flow called a convection current.",source:"NCERT Science, Ch.4 — Heat"},
       {type:"think",icon:"brain",label:"Think",color:C.accent,bg:C.accentSoft,content:"After the fastest molecules leave a liquid surface, what happens to the temperature of the remaining liquid?",hasInput:true},
       {type:"feedback",icon:"check",label:"Correct",color:C.success,bg:C.successSoft,content:"Yes! Average kinetic energy drops → temperature decreases. This is evaporative cooling — the same reason you feel cold stepping out of a pool."},
       {type:"practice",icon:"target",label:"Your turn",color:C.warn,bg:C.warnSoft,content:"Why does a fan make you feel cooler even though it doesn't lower room temperature?",hasInput:true},
@@ -358,6 +360,7 @@ return <div style={{display:"flex",flexDirection:"column",gap:14}}>
       </div>
       {persona!=="textbook"&&i<2&&<span style={{display:"inline-flex",alignItems:"center",gap:4,padding:"3px 10px",borderRadius:999,fontSize:10,fontWeight:600,background:`${C.accent}12`,color:C.accent,marginBottom:8}}>Explaining {personaLabels[persona].toLowerCase()}</span>}
       {displayContent&&<p style={{fontSize:14,color:C.text,margin:"0 0 12px",lineHeight:1.65}}>{displayContent}</p>}
+      {c.source&&<div style={{display:"inline-flex",alignItems:"center",gap:4,marginTop:6,padding:"3px 8px",borderRadius:6,background:C.borderSoft,fontSize:10,color:C.textMuted}}><I n="book" s={10} c={C.textMuted}/>Source: {c.source}</div>}
       {ExplainerComp&&<ExplainerComp {...(c.visual.props||{})}/>}
       {c.hasInput&&i===step&&<div style={{marginTop:12}}><textarea value={input} onChange={e=>setInput(e.target.value)} placeholder="Type your answer..." style={{width:"100%",minHeight:56,padding:"10px 14px",borderRadius:12,border:`1.5px solid ${C.border}`,fontFamily:"inherit",fontSize:13,resize:"vertical",boxSizing:"border-box",outline:"none"}}/><Btn variant="accent" onClick={adv} style={{marginTop:8,height:40,fontSize:13}}>Submit</Btn></div>}
     </Card>
@@ -372,6 +375,9 @@ return <div style={{display:"flex",flexDirection:"column",gap:14}}>
     </div>}
     </div>;
   })}
+  {step>0&&<div style={{display:"flex",alignItems:"center",gap:5,padding:"6px 12px",borderRadius:8,background:C.primarySoft,marginTop:4}}>
+  <I n="shield" s={12} c={C.primary}/><span style={{fontSize:11,color:C.primary,fontWeight:500}}>Answered from your school's curriculum</span>
+</div>}
   {step<cards.length-1&&!cards[step].hasInput&&<Btn full onClick={adv} variant="accent">Continue</Btn>}
 </div>;};
 
@@ -686,7 +692,7 @@ const FoundationScreen=({navigate})=>{
 };
 
 /* ============ MISTAKES ============ */
-const MistakeScreen=({navigate})=>{const mistakes=[{q:"Heat always flows from:",yourAns:"Cold to hot",correct:"Hot to cold",topic:"Heat Transfer",subject:"Science",date:"2d ago",misconception:"Confusing heat flow direction"},{q:"Simplify: 3/4 ÷ 1/2",yourAns:"3/8",correct:"3/2",topic:"Fractions",subject:"Math",date:"3d ago",misconception:"Dividing instead of multiplying by reciprocal"},{q:"Convection occurs in:",yourAns:"Solids",correct:"Liquids & gases",topic:"Convection",subject:"Science",date:"5d ago",misconception:"Mixing up conduction and convection"}];
+const MistakeScreen=({navigate})=>{const mistakes=[{q:"Heat always flows from:",yourAns:"Cold to hot",correct:"Hot to cold",topic:"Heat",subject:"Science",date:"2d ago",misconception:"Confusing heat flow direction"},{q:"Simplify: 3/4 ÷ 1/2",yourAns:"3/8",correct:"3/2",topic:"Fractions",subject:"Math",date:"3d ago",misconception:"Dividing instead of multiplying by reciprocal"},{q:"Convection occurs in:",yourAns:"Solids",correct:"Liquids & gases",topic:"Convection",subject:"Science",date:"5d ago",misconception:"Mixing up conduction and convection"}];
 return <div style={{display:"flex",flexDirection:"column",gap:16}}>
   <div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>navigate("home")}/><h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>My Mistakes</h1></div>
   <p style={{fontSize:13,color:C.textMuted,margin:0}}>Review errors before exams — your secret weapon</p>

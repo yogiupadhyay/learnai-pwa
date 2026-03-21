@@ -64,8 +64,11 @@ export default function LandingPage() {
         <h1 style={{ fontSize: 42, fontWeight: 800, color: "#0F172A", margin: "0 0 10px", letterSpacing: -1, lineHeight: 1.1 }}>
           Learn<span style={{ background: "linear-gradient(135deg, #2563EB, #7C3AED)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>AI</span>
         </h1>
-        <p style={{ fontSize: 17, color: "#64748B", margin: 0, lineHeight: 1.6, fontWeight: 400 }}>
+        <p style={{ fontSize: 17, color: "#64748B", margin: "0 0 8px", lineHeight: 1.6, fontWeight: 400 }}>
           AI-powered adaptive learning platform
+        </p>
+        <p style={{ fontSize: 13, color: "#94A3B8", margin: 0 }}>
+          Grade 1 to PhD &middot; White-label ready &middot; Built for schools & institutions
         </p>
       </div>
 

@@ -24,6 +24,7 @@ palette:<svg style={st} viewBox="0 0 24 24"><circle {...p} cx="13.5" cy="6.5" r=
 target:<svg style={st} viewBox="0 0 24 24"><circle {...p} cx="12" cy="12" r="10"/><circle {...p} cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill={c} stroke="none"/></svg>,
 calendar:<svg style={st} viewBox="0 0 24 24"><rect {...p} x="3" y="4" width="18" height="17" rx="2"/><path {...p} d="M3 10h18M8 2v4M16 2v4"/></svg>,
 star:<svg style={st} viewBox="0 0 24 24"><path {...p} fill={c} opacity="0.2" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/><path {...p} d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>,
+chevD:<svg style={st} viewBox="0 0 24 24"><path {...p} d="M6 9l6 6 6-6"/></svg>,
 };return icons[n]||null;};
 
 const Card=({children,style,onClick})=> <div onClick={onClick} style={{background:C.card,borderRadius:16,padding:20,border:`1px solid ${C.border}`,...(onClick?{cursor:"pointer"}:{}),...style}}>{children}</div>;
@@ -36,13 +37,15 @@ const Back=({onClick})=> <button onClick={onClick} style={{background:"transpare
 const Ring=({value,max=100,size=64,stroke=5,color=C.primary,children})=>{const r=(size-stroke)/2,circ=2*Math.PI*r,off=circ-(value/max)*circ;return <div style={{position:"relative",width:size,height:size}}><svg width={size} height={size} style={{transform:"rotate(-90deg)"}}><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={`${color}20`} strokeWidth={stroke}/><circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeDasharray={circ} strokeDashoffset={off} strokeLinecap="round" style={{transition:"stroke-dashoffset 0.6s ease"}}/></svg><div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>{children}</div></div>;};
 
 /* ============ DATA ============ */
-const org={name:"Delhi Public School",logo:"DPS",tagline:"Excellence in Education since 1949",board:"CBSE",color:"#1E40AF",students:420,teachers:18,classes:14,activeRate:78};
+const org={name:"Delhi Public School",logo:"DPS",tagline:"Excellence in Education since 1949",board:"CBSE",color:"#1E40AF",students:876,teachers:22,classes:19,activeRate:78};
 
+// MOCK DATA — In production, fetched from API. Teachers reference classes by name (will be classId in backend).
 const teachers=[
-  {name:"Ms. Sharma",subject:"Science + Math",classes:["6-A","6-B","7-A"],students:90,classAvg:58,topTopic:"Temperature",weakTopic:"Convection",effectiveness:72,active:true},
-  {name:"Mr. Patel",subject:"Science",classes:["6-A","8-B"],students:62,classAvg:65,topTopic:"Circuits",weakTopic:"Waves",effectiveness:78,active:true},
-  {name:"Mrs. Singh",subject:"Math",classes:["7-A","7-B","8-A"],students:92,classAvg:55,topTopic:"Algebra",weakTopic:"Geometry",effectiveness:68,active:true},
-  {name:"Mr. Verma",subject:"Science + Math",classes:["9-A","9-B"],students:64,classAvg:61,topTopic:"Mechanics",weakTopic:"Organic Chem",effectiveness:75,active:false},
+  {id:"t1",name:"Ms. Sharma",subject:"Science + Math",classes:["6-A","6-B","7-A"],students:90,classAvg:58,topTopic:"Temperature",weakTopic:"Convection",effectiveness:72,active:true},
+  {id:"t2",name:"Mr. Patel",subject:"Science",classes:["6-A","8-B"],students:62,classAvg:65,topTopic:"Circuits",weakTopic:"Waves",effectiveness:78,active:true},
+  {id:"t3",name:"Mrs. Singh",subject:"Math",classes:["7-A","7-B","8-A"],students:92,classAvg:55,topTopic:"Algebra",weakTopic:"Geometry",effectiveness:68,active:true},
+  {id:"t4",name:"Mr. Verma",subject:"Science + Math",classes:["9-A","9-B"],students:64,classAvg:61,topTopic:"Mechanics",weakTopic:"Organic Chem",effectiveness:75,active:false},
+  {id:"t5",name:"Dr. Kapoor",subject:"Physics + Chemistry",classes:[],students:0,classAvg:0,topTopic:"Thermodynamics",weakTopic:"Organic Chem",effectiveness:80,active:true},
 ];
 
 const curriculum=[
@@ -53,15 +56,38 @@ const curriculum=[
   {name:"NCERT Math — Class 7",type:"Textbook",status:"indexed",pages:310,uploadedBy:"Admin"},
   {name:"NCERT Math — Class 8",type:"Textbook",status:"processing",pages:330,uploadedBy:"Admin"},
   {name:"CBSE Lab Manual — Science",type:"Reference",status:"indexed",pages:120,uploadedBy:"Admin"},
+  {name:"NCERT Science — Class 9",type:"Textbook",status:"indexed",pages:280,uploadedBy:"Admin"},
+  {name:"NCERT Math — Class 9",type:"Textbook",status:"indexed",pages:320,uploadedBy:"Admin"},
+  {name:"NCERT Science — Class 10",type:"Textbook",status:"processing",pages:300,uploadedBy:"Admin"},
+  {name:"NCERT Math — Class 10",type:"Textbook",status:"processing",pages:340,uploadedBy:"Admin"},
+  {name:"NCERT Physics — Class 11",type:"Textbook",status:"pending",pages:350,uploadedBy:"Admin"},
+  {name:"NCERT Chemistry — Class 11",type:"Textbook",status:"pending",pages:320,uploadedBy:"Admin"},
+  {name:"NCERT Physics — Class 12",type:"Textbook",status:"pending",pages:380,uploadedBy:"Admin"},
+  {name:"NCERT Chemistry — Class 12",type:"Textbook",status:"pending",pages:360,uploadedBy:"Admin"},
+  {name:"NCERT Biology — Class 11",type:"Textbook",status:"failed",pages:340,uploadedBy:"Admin"},
 ];
 
+// MOCK DATA — Classes reference teachers[] (many-to-many). In production, classId is the primary key.
 const classData=[
-  {name:"Class 6-A",teacher:"Mr. Patel",students:32,mastery:65,active:28},
-  {name:"Class 6-B",teacher:"Ms. Sharma",students:28,mastery:58,active:24},
-  {name:"Class 7-A",teacher:"Ms. Sharma / Mrs. Singh",students:30,mastery:55,active:26},
-  {name:"Class 7-B",teacher:"Mrs. Singh",students:30,mastery:52,active:22},
-  {name:"Class 8-A",teacher:"Mrs. Singh",students:32,mastery:60,active:27},
-  {name:"Class 8-B",teacher:"Mr. Patel",students:30,mastery:63,active:25},
+  {id:"6a",name:"Class 6-A",teachers:["Mr. Patel","Ms. Sharma"],students:32,mastery:65,active:28,grade:6},
+  {id:"6b",name:"Class 6-B",teachers:["Ms. Sharma"],students:28,mastery:58,active:24,grade:6},
+  {id:"7a",name:"Class 7-A",teachers:["Ms. Sharma","Mrs. Singh"],students:30,mastery:55,active:26,grade:7},
+  {id:"7b",name:"Class 7-B",teachers:["Mrs. Singh"],students:30,mastery:52,active:22,grade:7},
+  {id:"8a",name:"Class 8-A",teachers:["Mrs. Singh"],students:32,mastery:60,active:27,grade:8},
+  {id:"8b",name:"Class 8-B",teachers:["Mr. Patel"],students:30,mastery:63,active:25,grade:8},
+  {id:"9a",name:"Class 9-A",teachers:["Mr. Verma"],students:32,mastery:57,active:26,grade:9},
+  {id:"9b",name:"Class 9-B",teachers:["Mr. Verma"],students:32,mastery:54,active:24,grade:9},
+  {id:"10a",name:"Class 10-A",teachers:[],students:34,mastery:0,active:0,grade:10},
+  {id:"10b",name:"Class 10-B",teachers:[],students:30,mastery:0,active:0,grade:10},
+  {id:"11a",name:"Class 11-A",teachers:[],students:28,mastery:0,active:0,grade:11},
+  {id:"11b",name:"Class 11-B",teachers:[],students:26,mastery:0,active:0,grade:11},
+  {id:"12a",name:"Class 12-A",teachers:[],students:24,mastery:0,active:0,grade:12},
+  {id:"ug1",name:"UG Year 1",teachers:[],students:60,mastery:0,active:0,grade:13},
+  {id:"ug2",name:"UG Year 2",teachers:[],students:55,mastery:0,active:0,grade:14},
+  {id:"ug3",name:"UG Year 3",teachers:[],students:48,mastery:0,active:0,grade:15},
+  {id:"ug4",name:"UG Year 4",teachers:[],students:42,mastery:0,active:0,grade:16},
+  {id:"pg1",name:"PG Year 1",teachers:[],students:30,mastery:0,active:0,grade:17},
+  {id:"pg2",name:"PG Year 2",teachers:[],students:25,mastery:0,active:0,grade:18},
 ];
 
 /* ============ DASHBOARD ============ */
@@ -91,7 +117,7 @@ const DashboardScreen=({navigate})=> {
       {classData.map((cl,i)=>{const mc=cl.mastery>=60?C.success:cl.mastery>=45?C.warn:C.error;return <Card key={i} onClick={()=>navigate("classDetail",cl)} style={{marginBottom:8,padding:14,display:"flex",alignItems:"center",gap:14}}>
         <div style={{width:40,textAlign:"center"}}><p style={{fontSize:18,fontWeight:800,color:mc,margin:0}}>{cl.mastery}%</p></div>
         <div style={{flex:1}}>
-          <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}><span style={{fontSize:13,fontWeight:600,color:C.text}}>{cl.name}</span><span style={{fontSize:11,color:C.textMuted}}>• {cl.teacher}</span></div>
+          <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}><span style={{fontSize:13,fontWeight:600,color:C.text}}>{cl.name}</span><span style={{fontSize:11,color:C.textMuted}}>• {cl.teachers.length?cl.teachers.join(" / "):"No teacher assigned"}</span></div>
           <Bar value={cl.mastery} color={mc} h={4}/>
           <p style={{fontSize:11,color:C.textMuted,margin:"4px 0 0"}}>{cl.active}/{cl.students} active</p>
         </div>
@@ -101,7 +127,7 @@ const DashboardScreen=({navigate})=> {
     {/* Quick actions */}
     <div><p style={{fontSize:14,fontWeight:700,color:C.text,margin:"0 0 10px"}}>Quick actions</p>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-        {[{label:"Upload books",icon:"upload",color:C.primary,screen:"curriculum"},{label:"Add teacher",icon:"plus",color:C.teal,screen:"teachers"},{label:"Branding",icon:"palette",color:C.accent,screen:"branding"},{label:"Analytics",icon:"chart",color:C.success,screen:"analytics"}].map(a=> <Card key={a.label} onClick={()=>navigate(a.screen)} style={{cursor:"pointer",padding:16,textAlign:"center"}}>
+        {[{label:"Upload books",icon:"upload",color:C.primary,screen:"curriculum"},{label:"Add teacher",icon:"plus",color:C.teal,screen:"teachers"},{label:"Assignments",icon:"edit",color:C.warn,screen:"assignments"},{label:"Branding",icon:"palette",color:C.accent,screen:"branding"},{label:"Analytics",icon:"chart",color:C.success,screen:"analytics"}].map(a=> <Card key={a.label} onClick={()=>navigate(a.screen)} style={{cursor:"pointer",padding:16,textAlign:"center"}}>
           <div style={{width:40,height:40,borderRadius:12,background:`${a.color}12`,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 8px"}}><I n={a.icon} s={22} c={a.color}/></div>
           <p style={{fontSize:13,fontWeight:600,color:C.text,margin:0}}>{a.label}</p>
         </Card>)}
@@ -136,7 +162,7 @@ const TeachersScreen=({navigate})=> {
 /* ============ TEACHER DETAIL ============ */
 const TeacherDetailScreen=({navigate,teacher})=> {
   const t=teacher||teachers[0];
-  const tClasses=classData.filter(cl=>cl.teacher.includes(t.name.split(" ")[1]||t.name));
+  const tClasses=classData.filter(cl=>cl.teachers.includes(t.name));
   const activeStudents=tClasses.reduce((s,cl)=>s+cl.active,0);
   return <div style={{display:"flex",flexDirection:"column",gap:16}}>
     <div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>navigate("teachers")}/><h1 style={{fontSize:20,fontWeight:800,color:C.text,margin:0}}>{t.name}</h1></div>
@@ -202,7 +228,7 @@ const ClassDetailScreen=({navigate,classInfo})=> {
 
     <Card style={{padding:16}}>
       <p style={{fontSize:16,fontWeight:700,color:C.text,margin:"0 0 4px"}}>{cl.name}</p>
-      <p style={{fontSize:12,color:C.textMuted,margin:"0 0 4px"}}>{cl.teacher}</p>
+      <p style={{fontSize:12,color:C.textMuted,margin:"0 0 4px"}}>{cl.teachers.length?cl.teachers.join(" / "):"No teacher assigned"}</p>
       <Pill text={`${cl.students} students`} color={C.primary} icon="users"/>
     </Card>
 
@@ -362,7 +388,7 @@ const CurriculumScreen=({navigate})=> {
       <p style={{fontSize:12,color:C.primary,margin:0}}>Books uploaded here become the official curriculum. They power AI answers for all students and teachers in your institution.</p>
     </Card>
 
-    <div style={{display:"flex",gap:8}}><Pill text={`${curriculum.filter(c=>c.status==="indexed").length} indexed`} color={C.success} icon="check"/><Pill text={`${curriculum.filter(c=>c.status==="processing").length} processing`} color={C.warn} icon="brain"/></div>
+    <div style={{display:"flex",gap:8}}><Pill text={`${curriculum.filter(c=>c.status==="indexed").length} indexed`} color={C.success} icon="check"/><Pill text={`${curriculum.filter(c=>c.status==="processing").length} processing`} color={C.warn} icon="brain"/>{curriculum.filter(c=>c.status==="failed").length>0&&<Pill text={`${curriculum.filter(c=>c.status==="failed").length} failed`} color={C.error} icon="alert"/>}</div>
 
     {curriculum.map((b,i)=> <Card key={i} style={{padding:14,display:"flex",alignItems:"center",gap:14}}>
       <div style={{width:44,height:44,borderRadius:12,background:`${C.primary}12`,display:"flex",alignItems:"center",justifyContent:"center"}}><I n="book" s={22} c={C.primary}/></div>
@@ -370,7 +396,8 @@ const CurriculumScreen=({navigate})=> {
         <p style={{fontSize:14,fontWeight:600,color:C.text,margin:0}}>{b.name}</p>
         <p style={{fontSize:12,color:C.textMuted,margin:"2px 0 0"}}>{b.type} • {b.pages} pages</p>
       </div>
-      <Pill text={b.status==="indexed"?"Indexed":"Processing..."} color={b.status==="indexed"?C.success:C.warn} icon={b.status==="indexed"?"check":"brain"}/>
+      <Pill text={b.status==="indexed"?"Indexed":b.status==="processing"?"Processing...":b.status==="failed"?"Failed":"Pending"} color={b.status==="indexed"?C.success:b.status==="processing"?C.warn:b.status==="failed"?C.error:C.textMuted} icon={b.status==="indexed"?"check":b.status==="failed"?"alert":"brain"}/>
+      {b.status==="failed"&&<Btn variant="small" style={{background:C.errorSoft,color:C.errorDark,height:28,fontSize:11}}>Re-index</Btn>}
     </Card>)}
 
     <Card style={{border:`2px dashed ${C.primary}`,background:C.primarySoft,padding:24,textAlign:"center",cursor:"pointer"}}>
@@ -515,6 +542,62 @@ const SettingsScreen=({navigate})=> {
   </div>;
 };
 
+/* ============ CLASS-TEACHER ASSIGNMENTS ============ */
+// Admin assigns teachers to classes here. In production, this writes to the assignments API.
+const AssignmentsScreen=({navigate})=>{
+  const[editing,setEditing]=useState(null);
+  const[assignments,setAssignments]=useState(classData.map(cl=>({id:cl.id,name:cl.name,teachers:[...cl.teachers],grade:cl.grade})));
+
+  const toggleTeacher=(classId,teacherName)=>{
+    setAssignments(prev=>prev.map(a=>{
+      if(a.id!==classId)return a;
+      const has=a.teachers.includes(teacherName);
+      return {...a,teachers:has?a.teachers.filter(t=>t!==teacherName):[...a.teachers,teacherName]};
+    }));
+  };
+
+  // Group by grade label
+  const gradeLabels={6:"Class 6",7:"Class 7",8:"Class 8",9:"Class 9",10:"Class 10",11:"Class 11",12:"Class 12",13:"UG Year 1",14:"UG Year 2",15:"UG Year 3",16:"UG Year 4",17:"PG Year 1",18:"PG Year 2"};
+  const grades=[...new Set(assignments.map(a=>a.grade))];
+
+  return <div style={{display:"flex",flexDirection:"column",gap:16}}>
+    <div style={{display:"flex",alignItems:"center",gap:12}}><Back onClick={()=>navigate("dashboard")}/><div><h1 style={{fontSize:22,fontWeight:800,color:C.text,margin:0}}>Class assignments</h1><p style={{fontSize:13,color:C.textMuted,margin:"2px 0 0"}}>Assign teachers to classes</p></div></div>
+
+    {grades.map(g=>{
+      const gClasses=assignments.filter(a=>a.grade===g);
+      return <div key={g}>
+        <p style={{fontSize:13,fontWeight:700,color:C.textMuted,margin:"0 0 8px",textTransform:"uppercase",letterSpacing:0.5}}>{gradeLabels[g]||`Grade ${g}`}</p>
+        {gClasses.map(cl=>{
+          const isEditing=editing===cl.id;
+          return <Card key={cl.id} style={{marginBottom:8,padding:0,overflow:"hidden"}}>
+            <button onClick={()=>setEditing(isEditing?null:cl.id)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",padding:"14px 16px",background:"transparent",border:"none",cursor:"pointer",fontFamily:"inherit"}}>
+              <div style={{display:"flex",alignItems:"center",gap:10}}>
+                <span style={{fontSize:14,fontWeight:600,color:C.text}}>{cl.name}</span>
+                {cl.teachers.length===0&&<span style={{fontSize:11,color:C.error,fontWeight:500}}>No teacher</span>}
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
+                {cl.teachers.map(t=><Pill key={t} text={t} color={C.primary} bg={C.primarySoft}/>)}
+                <I n={isEditing?"chevD":"arrowR"} s={16} c={C.textMuted}/>
+              </div>
+            </button>
+            {isEditing&&<div style={{padding:"0 16px 14px",borderTop:`1px solid ${C.borderSoft}`}}>
+              <p style={{fontSize:12,color:C.textMuted,margin:"10px 0 8px"}}>Toggle teachers for {cl.name}:</p>
+              {teachers.map(t=>{
+                const assigned=cl.teachers.includes(t.name);
+                return <button key={t.id} onClick={()=>toggleTeacher(cl.id,t.name)} style={{display:"flex",alignItems:"center",gap:12,width:"100%",padding:"10px 12px",borderRadius:10,border:`1.5px solid ${assigned?C.primary:C.border}`,background:assigned?C.primarySoft:"transparent",cursor:"pointer",fontFamily:"inherit",marginBottom:6}}>
+                  <div style={{width:22,height:22,borderRadius:6,border:`2px solid ${assigned?C.primary:C.border}`,display:"flex",alignItems:"center",justifyContent:"center",background:assigned?C.primary:"transparent"}}>{assigned&&<I n="check" s={13} c="#fff" w={2.5}/>}</div>
+                  <div style={{flex:1,textAlign:"left"}}><p style={{fontSize:13,fontWeight:assigned?600:400,color:assigned?C.primary:C.text,margin:0}}>{t.name}</p><p style={{fontSize:11,color:C.textMuted,margin:"1px 0 0"}}>{t.subject}</p></div>
+                  {!t.active&&<Pill text="Inactive" color={C.textFaint} bg={C.borderSoft}/>}
+                </button>;
+              })}
+            </div>}
+          </Card>;
+        })}
+      </div>;
+    })}
+  </div>;
+};
+
 /* ============ APP SHELL ============ */
 export default function OrgApp(){
   const[screen,setScreen]=useState("dashboard");
@@ -526,8 +609,8 @@ export default function OrgApp(){
   useEffect(()=>{const h=(e)=>navigateRef.current?.(e.detail);window.addEventListener('sidebar-nav',h);return()=>window.removeEventListener('sidebar-nav',h);},[]);
 
   const navItems=[{id:"dashboard",icon:"home",label:"Dashboard"},{id:"teachers",icon:"users",label:"Teachers"},{id:"curriculum",icon:"book",label:"Curriculum"},{id:"analytics",icon:"chart",label:"Analytics"},{id:"settings",icon:"settings",label:"Settings"}];
-  const screens={dashboard:<DashboardScreen navigate={navigate}/>,teachers:<TeachersScreen navigate={navigate}/>,curriculum:<CurriculumScreen navigate={navigate}/>,branding:<BrandingScreen navigate={navigate}/>,analytics:<AnalyticsScreen navigate={navigate}/>,users:<UsersScreen navigate={navigate}/>,settings:<SettingsScreen navigate={navigate}/>,teacherDetail:<TeacherDetailScreen navigate={navigate} teacher={context||teachers[0]}/>,classDetail:<ClassDetailScreen navigate={navigate} classInfo={context||classData[0]}/>,studentDetail:<StudentDetailScreen navigate={navigate} student={context}/>,calendar:<CalendarScreen navigate={navigate}/>,billing:<BillingScreen navigate={navigate}/>};
-  const activeNav=screen==="branding"?"settings":screen==="users"?"settings":screen==="teacherDetail"?"teachers":screen==="classDetail"?"dashboard":screen==="studentDetail"?"dashboard":screen==="calendar"?"settings":screen==="billing"?"settings":screen;
+  const screens={dashboard:<DashboardScreen navigate={navigate}/>,teachers:<TeachersScreen navigate={navigate}/>,curriculum:<CurriculumScreen navigate={navigate}/>,branding:<BrandingScreen navigate={navigate}/>,analytics:<AnalyticsScreen navigate={navigate}/>,users:<UsersScreen navigate={navigate}/>,settings:<SettingsScreen navigate={navigate}/>,teacherDetail:<TeacherDetailScreen navigate={navigate} teacher={context||teachers[0]}/>,classDetail:<ClassDetailScreen navigate={navigate} classInfo={context||classData[0]}/>,studentDetail:<StudentDetailScreen navigate={navigate} student={context}/>,calendar:<CalendarScreen navigate={navigate}/>,billing:<BillingScreen navigate={navigate}/>,assignments:<AssignmentsScreen navigate={navigate}/>};
+  const activeNav=screen==="branding"?"settings":screen==="users"?"settings":screen==="teacherDetail"?"teachers":screen==="classDetail"?"dashboard":screen==="studentDetail"?"dashboard":screen==="calendar"?"settings":screen==="billing"?"settings":screen==="assignments"?"dashboard":screen;
 
   return <div style={{fontFamily:'"Inter",-apple-system,sans-serif',maxWidth:"100%",margin:"0 auto",background:C.bg,minHeight:"100vh",display:"flex",flexDirection:"column",borderRadius:0,overflow:"hidden",boxShadow:"none",position:"relative"}}>
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 18px 10px",background:C.card,borderBottom:`1px solid ${C.border}`}}>
