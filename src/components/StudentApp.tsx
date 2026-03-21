@@ -916,8 +916,9 @@ const PracticeScreen=({navigate,addXP,ctx,topicProgress,setTopicProgress})=>{
 };
 
 /* ============ APP SHELL ============ */
+import StudentApp9 from "./StudentApp9";
 export default function App(){
-  const[onboarded,setOnboarded]=useState(false);const[screen,setScreen]=useState("home");const[xp,setXP]=useState(240);const[streak]=useState(3);const scrollRef=useRef(null);const[buddyOpen,setBuddyOpen]=useState(false);
+  const[onboarded,setOnboarded]=useState(false);const[tier,setTier]=useState(null);const[screen,setScreen]=useState("home");const[xp,setXP]=useState(240);const[streak]=useState(3);const scrollRef=useRef(null);const[buddyOpen,setBuddyOpen]=useState(false);
   const[screenCtx,setScreenCtx]=useState(null);
   const[topicProgress,setTopicProgress]=useState({
     fractions:{learn:"done",teach:"ready",practice:3},
@@ -930,6 +931,50 @@ export default function App(){
   const navigate=(s,ctx)=>{setOnboarded(true);setScreen(s);setScreenCtx(ctx||null);scrollRef.current?.scrollTo(0,0);};const addXP=(n)=>setXP(x=>x+n);
   navigateRef.current=navigate;
   useEffect(()=>{const h=(e)=>navigateRef.current?.(e.detail);window.addEventListener('sidebar-nav',h);return()=>window.removeEventListener('sidebar-nav',h);},[]);
+
+  /* Class → tier mapping: 1-5=tier1(future), 6-8=tier2, 9-12=tier3, 13+=tier4(future) */
+  const classToTier=(cls)=>cls<=5?1:cls<=8?2:cls<=12?3:4;
+  const selectClass=(cls)=>{setTier(classToTier(cls));};
+  if(tier===3)return <StudentApp9/>;
+  /* tier 1 and 4 not built yet — show coming soon and let user pick again */
+  if(tier===1||tier===4){return <div style={{fontFamily:'"Inter",-apple-system,sans-serif',maxWidth:"100%",margin:"0 auto",background:C.bg,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 20px",textAlign:"center"}}>
+    <div style={{width:64,height:64,borderRadius:16,background:C.warnSoft,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:20}}><I n="clock" s={28} c={C.warn}/></div>
+    <h2 style={{fontSize:22,fontWeight:800,color:C.text,margin:"0 0 8px"}}>Coming Soon</h2>
+    <p style={{fontSize:14,color:C.textMuted,margin:"0 0 24px"}}>{tier===1?"Class 1-5":"UG & PG"} experience is under development</p>
+    <Btn onClick={()=>setTier(null)}>Choose another class</Btn>
+  </div>;}
+  if(!onboarded&&tier===null){
+  const tiers=[
+    {label:"Middle School",classes:[6,7,8],color:C.primary,softBg:C.primarySoft,desc:"Interactive AI tutor, gamified learning & teach-back",icon:"book",delay:0.1},
+    {label:"High School",classes:[9,10,11,12],color:C.accent,softBg:C.accentSoft,desc:"Board exam prep, PYQ analysis & mock tests",icon:"target",delay:0.2},
+    {label:"Higher Education",classes:null,color:C.textFaint,softBg:C.borderSoft,desc:"Coming soon — UG & PG experiences",icon:"trophy",delay:0.3,disabled:true},
+  ];
+  return <div style={{fontFamily:'"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',maxWidth:"100%",margin:"0 auto",background:C.bg,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 20px"}}>
+    <style>{`@keyframes csIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}} @keyframes csPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}`}</style>
+    <div style={{width:56,height:56,borderRadius:16,background:"linear-gradient(135deg, #2563EB, #7C3AED)",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 8px 28px rgba(37,99,235,0.2)",marginBottom:20}}><I n="spark" s={28} c="#fff" w={2}/></div>
+    <h1 style={{fontSize:28,fontWeight:800,color:C.text,margin:"0 0 4px",letterSpacing:-0.5}}>What class are you in?</h1>
+    <p style={{fontSize:14,color:C.textMuted,margin:"0 0 32px",letterSpacing:0.1}}>We'll personalize everything for you</p>
+    <div style={{display:"flex",flexDirection:"column",gap:12,width:"100%",maxWidth:360}}>
+      {tiers.map(t=><div key={t.label} style={{animation:`csIn 0.5s ease ${t.delay}s both`}}>
+        <div style={{background:"#fff",borderRadius:20,padding:"20px 20px 16px",border:`1.5px solid ${t.disabled?C.border:t.color}25`,boxShadow:"0 1px 3px rgba(0,0,0,0.04)",opacity:t.disabled?0.6:1,transition:"box-shadow 0.2s"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+            <div style={{width:36,height:36,borderRadius:10,background:t.softBg,display:"flex",alignItems:"center",justifyContent:"center"}}><I n={t.icon} s={18} c={t.color} w={2}/></div>
+            <div><p style={{fontSize:16,fontWeight:700,color:C.text,margin:0}}>{t.label}</p><p style={{fontSize:11,color:C.textMuted,margin:"1px 0 0"}}>{t.desc}</p></div>
+          </div>
+          {t.classes?<div style={{display:"flex",gap:8}}>
+            {t.classes.map(cls=><button key={cls} onClick={()=>selectClass(cls)} style={{flex:1,height:48,borderRadius:12,border:"none",background:t.softBg,cursor:"pointer",fontFamily:"inherit",display:"flex",alignItems:"center",justifyContent:"center",transition:"all 0.15s"}}>
+              <span style={{fontSize:17,fontWeight:700,color:t.color}}>{cls}</span>
+            </button>)}
+          </div>:<div style={{display:"flex",gap:8}}>
+            {[{label:"UG",sub:"Undergraduate"},{label:"PG",sub:"Postgraduate"}].map(h=><button key={h.label} onClick={()=>selectClass(h.label==="UG"?13:17)} style={{flex:1,height:48,borderRadius:12,border:"none",background:t.softBg,cursor:"not-allowed",fontFamily:"inherit",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:1,opacity:0.5}}>
+              <span style={{fontSize:14,fontWeight:700,color:C.textMuted}}>{h.label}</span>
+              <span style={{fontSize:9,color:C.textFaint}}>{h.sub}</span>
+            </button>)}
+          </div>}
+        </div>
+      </div>)}
+    </div>
+  </div>;}
 
   if(!onboarded)return <div style={{fontFamily:'"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',maxWidth:"100%",margin:"0 auto",background:C.bg,minHeight:"100vh",borderRadius:0,overflow:"hidden",boxShadow:"none",position:"relative"}}><OnboardingScreen onComplete={()=>setOnboarded(true)}/></div>;
 
